@@ -17,7 +17,7 @@ const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 30, skipSuccess
 const registerLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: config.registerLimit, standardHeaders: true, legacyHeaders: false, message: { error: 'Trop d\'inscriptions depuis cette adresse. Réessaie plus tard.' } });
 
 function publicUser(u) {
-  return { id: u.id, email: u.email, role: u.role, name: u.name, tel: u.tel || null, status: u.status, status_note: u.status_note || null,
+  return { id: u.id, email: u.email, role: u.is_guest ? 'invite' : u.role, name: u.name, tel: u.tel || null, status: u.status, status_note: u.status_note || null,
     plan: u.plan, plan_until: u.plan_until || null, is_admin: !!u.is_admin, email_verified: !!u.email_verified };
 }
 
@@ -49,6 +49,8 @@ router.post('/register', registerLimiter, async (req, res, next) => {
     if (await db.prepare('SELECT 1 FROM users WHERE email = ?').get(d.email)) throw new HttpError(409, 'Un compte existe déjà avec cette adresse e-mail.', 'email');
 
     const isAdmin = config.adminEmails.includes(d.email) ? 1 : 0;
+    const isGuest = d.role === 'invite' ? 1 : 0;
+    const dbRole = isGuest ? 'joueur' : d.role; // un invité n'a pas de rôle métier : stocké comme membre simple, marqué is_guest
     const hash = await bcrypt.hash(d.password, config.bcryptRounds);
     // Photo de profil : obligatoire pour les joueurs, contrôlée avant de créer le compte.
     if (d.role === 'joueur' && !d.photo) throw new HttpError(400, 'La photo de profil est obligatoire pour les joueurs.', 'photo');
@@ -56,11 +58,12 @@ router.post('/register', registerLimiter, async (req, res, next) => {
     let id;
     try {
       id = await db.tx(async t => {
-        const r = await t.prepare('INSERT INTO users (email, pass_hash, role, name, tel, status, is_admin) VALUES (?,?,?,?,?,?,?)')
-          .run(d.email, hash, d.role, d.name, d.tel || null, isAdmin ? 'verifie' : 'en_attente', isAdmin);
+        const r = await t.prepare('INSERT INTO users (email, pass_hash, role, name, tel, status, is_admin, is_guest) VALUES (?,?,?,?,?,?,?,?)')
+          .run(d.email, hash, dbRole, d.name, d.tel || null, (isAdmin || isGuest) ? 'verifie' : 'en_attente', isAdmin, isGuest);
         const uid = Number(r.lastInsertRowid);
         await t.prepare('INSERT INTO profiles (user_id, data, dob, nat, city, pos, lvl, minor) VALUES (?,?,?,?,?,?,?,?)')
           .run(uid, JSON.stringify(prof), prof.dob || null, prof.nat || prof.ctry || null, prof.city || null, prof.pos || null, prof.lvl || null, 0);
+        if (isGuest) await t.prepare('INSERT INTO guests (country, who, interests, email) VALUES (?,?,?,?)').run(prof.ctry, prof.who || null, JSON.stringify(prof.see || []), d.email);
         if (d.photo) { const mime = await savePhoto(uid, d.photo, t); await t.prepare('UPDATE profiles SET has_photo = 1, photo_mime = ? WHERE user_id = ?').run(mime, uid); }
         return uid;
       });

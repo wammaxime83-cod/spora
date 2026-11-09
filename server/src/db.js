@@ -137,6 +137,7 @@ db.deleteUser = id => db.tx(async t => {
 db.ready = (async () => {
   await client.execute('PRAGMA foreign_keys = ON').catch(() => {});
   for (const sql of SCHEMA) await client.execute(sql);
+  await client.execute('ALTER TABLE users ADD COLUMN is_guest INTEGER NOT NULL DEFAULT 0').catch(() => {});
   await purge();
   setInterval(() => purge().catch(() => {}), 6 * 3600 * 1000).unref();
 })();

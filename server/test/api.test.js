@@ -96,6 +96,12 @@ test('accès admin refusé aux non-admins, invité, export, suppression', async 
   assert.equal((await c.req('GET', '/api/admin/stats')).status, 403);
   assert.equal((await new Client().req('POST', '/api/guest', { country: 'Cameroun', who: 'Parent', interests: ['Joueurs'], email: 'invite@test.cm' })).status, 201);
   assert.equal((await new Client().req('POST', '/api/guest', { country: 'Cameroun' })).status, 400);
+  const g = new Client();
+  const gr = await g.req('POST', '/api/auth/register', { role: 'invite', name: 'Invité Test', email: 'g1@test.cm', password: 'Motdepasse!2026x', accept_terms: true, profile: { ctry: 'Cameroun', who: 'Parent', see: ['Highlights'] } });
+  assert.equal(gr.status, 201);
+  assert.equal(gr.body.user.role, 'invite');
+  assert.equal((await new Client().req('POST', '/api/auth/register', { role: 'invite', name: 'X Y', email: 'g2@test.cm', accept_terms: true, profile: { ctry: 'Cameroun' } })).status, 400);
+  assert.equal((await g.req('POST', '/api/me/videos/sign', {})).status >= 400, true);
   const ex = await c.req('GET', '/api/me/export'); assert.equal(ex.status, 200); assert.ok(!('pass_hash' in ex.body.account));
   assert.equal((await c.req('DELETE', '/api/auth/me', { password: 'faux' })).status, 403);
   assert.equal((await c.req('DELETE', '/api/auth/me', { password: 'Sup3r-Secret!' })).status, 200);

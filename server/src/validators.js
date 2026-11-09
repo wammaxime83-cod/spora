@@ -59,10 +59,16 @@ const club = z.object({
   bio: opt(txt(1000)),
 }).strict();
 
-const profileSchemas = { joueur, agent, club };
+const invite = z.object({
+  ctry: z.enum(COUNTRIES),
+  who: opt(z.enum(['Parent', 'Entraîneur', 'Supporter', 'Journaliste', 'Curieux'])),
+  see: z.array(z.enum(['Joueurs', 'Agents', 'Clubs', 'Highlights', 'Opportunités'])).max(5).optional().default([]),
+}).strict();
+
+const profileSchemas = { joueur, agent, club, invite };
 
 const register = z.object({
-  role: z.enum(['joueur', 'agent', 'club']),
+  role: z.enum(['joueur', 'agent', 'club', 'invite']),
   name: txt(120, 2),
   email,
   tel: phone,

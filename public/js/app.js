@@ -171,7 +171,7 @@ var LVL=['Académie / formation','Amateur','Régional','Division 2','Division 1'
 var ROLES={joueur:{n:'Joueur',d:'Je veux être repéré par les clubs et les agents.',i:'<circle cx="12" cy="12" r="9"/><path d="M12 7l4 3-1.5 5h-5L8 10z"/>'},
  agent:{n:'Agent',d:'Je cherche des talents et je développe mon réseau.',i:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M3 13h18"/>'},
  club:{n:'Club ou académie',d:'Je recrute et je fais connaître ma structure.',i:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>'},
- invite:{n:'Invité',d:'Je découvre Spora, sans créer de compte.',i:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'}};
+ invite:{n:'Invité',d:'Je découvre Spora : highlights, commentaires et opportunités.',i:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'}};
 var S={mode:'sign',role:null,step:0,v:{},err:{},photo:null,msg:''};
 function F(id,l,t,o){o=o||{};o.id=id;o.l=l;o.t=t;return o}
 var ACC=[F('name','Nom complet','text',{req:1,ph:'Prénom et nom',full:1}),F('email','Adresse e-mail','email',{req:1,ph:'toi@exemple.com'}),F('tel','Téléphone','tel',{ph:'+237 6XX XX XX XX'}),F('pw','Mot de passe','password',{req:1,ph:'8 caractères minimum',full:1})];
@@ -184,8 +184,8 @@ agent:[F('photo','Photo','photo',{full:1}),F('org','Nom professionnel ou agence'
  F('pemail','E-mail professionnel','email'),F('ptel','Téléphone professionnel','tel'),F('priv','Visibilité de tes coordonnées','select',{o:['Visibles par les membres vérifiés','Visibles après mise en contact','Masquées'],full:1}),F('bio','Présentation','textarea',{ph:'Ton activité, les profils que tu recherches…',full:1})],
 club:[F('photo','Logo ou photo de la structure','photo',{full:1}),F('org','Nom de la structure','text',{req:1,full:1}),F('typ','Type','select',{req:1,o:['Club professionnel','Club amateur','Académie','Centre de formation']}),F('crea','Année de création','number',{ph:'2010'}),F('ctry','Pays','select',{req:1,o:CT}),F('city','Ville','text',{req:1}),
  F('champ','Championnat ou niveau','text',{ph:'Ex. Élite Two, régional…',full:1}),F('resp','Responsable (nom et fonction)','text',{req:1,ph:'Ex. A. Mbarga, directeur sportif',full:1}),F('pemail','E-mail professionnel','email',{req:1}),F('ptel','Téléphone','tel'),F('seek','Postes recherchés','chips',{o:POS,full:1}),F('web','Site ou réseau social','text',{full:1}),F('bio','Présentation','textarea',{ph:'Ta structure, ton projet sportif…',full:1})],
-invite:[F('ctry','Ton pays','select',{req:1,o:CT}),F('who','Tu es plutôt…','radio',{o:['Parent','Entraîneur','Supporter','Journaliste','Curieux'],full:1}),F('see','Ce que tu veux découvrir','chips',{o:['Joueurs','Agents','Clubs','Highlights','Opportunités'],full:1}),F('email','Ton e-mail (pour être prévenu au lancement)','email',{full:1,req:1,ph:'toi@exemple.com'})]};
-function steps(){return S.role==='invite'?['Profil','Infos','Terminé']:['Profil','Compte','Informations','Terminé']}
+invite:[F('ctry','Ton pays','select',{req:1,o:CT}),F('who','Tu es plutôt…','radio',{o:['Parent','Entraîneur','Supporter','Journaliste','Curieux'],full:1}),F('see','Ce que tu veux découvrir','chips',{o:['Joueurs','Agents','Clubs','Highlights','Opportunités'],full:1})]};
+function steps(){return ['Profil','Compte','Informations','Terminé']}
 function key(){var st=steps();var k=st[S.step];return k==='Profil'?'role':k==='Compte'?'acc':k==='Terminé'?'done':'info'}
 function esc(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function ic(p){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>'}
@@ -233,10 +233,10 @@ function next(){var k=key();S.msg='';
 function payload(){var v=S.v,r=S.role,p={};INFO[r].forEach(function(f){if(f.t==='photo')return;var x=v[f.id];if(Array.isArray(x))p[f.id]=x;else if(x!==undefined&&x!==''&&x!==null)p[f.id]=f.t==='number'?Number(x):x});
  return {role:r,name:v.name,email:v.email,tel:v.tel||undefined,password:v.pw,accept_terms:true,profile:p,photo:S.photo||undefined}}
 function submit(){S.busy=true;S.msg='';render();
- var call=S.role==='invite'?Spora.api('POST','/guest',{country:S.v.ctry,who:S.v.who||undefined,interests:S.v.see||[],email:S.v.email}):Spora.api('POST','/auth/register',payload());
+ var call=Spora.api('POST','/auth/register',payload());
  call.then(function(j){S.busy=false;if(j&&j.user)Spora.set(j.user);S.step++;go()},function(e){S.busy=false;var f=e.field||'';S.msg=e.message;
   if(/^profile\./.test(f)){var id=f.slice(8).split('.')[0];S.err[id]=e.message;}
-  else if(f==='email'||f==='password'||f==='name'||f==='tel'||f==='accept_terms'){var m={password:'pw',accept_terms:'cgu'}[f]||f;S.err[m]=e.message;S.step=S.role==='invite'?S.step:1}
+  else if(f==='email'||f==='password'||f==='name'||f==='tel'||f==='accept_terms'){var m={password:'pw',accept_terms:'cgu'}[f]||f;S.err[m]=e.message;S.step=1}
   render();focusErr()})}
 function go(){render();var c=document.querySelector('.jn-card');if(c&&c.getBoundingClientRect().top<0)c.scrollIntoView({behavior:'smooth',block:'start'})}
 function focusErr(){var b=host.querySelector('.bad,.er');if(b)b.scrollIntoView({behavior:'smooth',block:'center'})}

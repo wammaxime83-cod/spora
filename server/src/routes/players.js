@@ -26,7 +26,7 @@ function card(row, full) {
 }
 
 const SELECT = `SELECT u.id, u.name, u.plan, u.plan_until, p.data, p.dob, p.nat, p.city, p.pos, p.lvl, p.has_photo, (SELECT COUNT(*) FROM videos v WHERE v.user_id = u.id) AS vcount, p.minor
-  FROM users u JOIN profiles p ON p.user_id = u.id WHERE u.role='joueur' AND u.status='verifie' AND u.is_admin=0`;
+  FROM users u JOIN profiles p ON p.user_id = u.id WHERE u.role='joueur' AND u.status='verifie' AND u.is_admin=0 AND u.is_guest=0`;
 
 router.get('/', async (req, res) => {
   const q = req.query;
@@ -50,7 +50,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:id/videos', async (req, res) => {
   const cl = require('../cloudinary');
-  const ok = await db.get("SELECT 1 FROM users WHERE id=? AND status='verifie' AND is_admin=0", [Number(req.params.id)]);
+  const ok = await db.get("SELECT 1 FROM users WHERE id=? AND status='verifie' AND is_admin=0 AND is_guest=0", [Number(req.params.id)]);
   if (!ok) return res.json({ videos: [] });
   const rows = await db.all('SELECT * FROM videos WHERE user_id=? ORDER BY id DESC', [Number(req.params.id)]);
   res.json({ videos: rows.map(r => ({ id: r.id, title: r.title, ...cl.urls(r.public_id) })) });
@@ -74,9 +74,10 @@ contactsRouter.post('/', requireAuth, contactLimiter, async (req, res, next) => 
     const p = V.contact.safeParse(req.body);
     if (!p.success) { const e = V.firstError(p.error); throw new HttpError(400, e.message); }
     const me = req.user;
+    if (me.is_guest) throw new HttpError(403, 'Les invités ne peuvent pas contacter de membres.');
     if (me.role === 'joueur') throw new HttpError(403, 'Seuls les agents et clubs peuvent contacter un joueur.');
     if (me.status !== 'verifie') throw new HttpError(403, 'Ton profil doit d\'abord être vérifié par l\'équipe Spora.');
-    const to = await db.prepare("SELECT u.* FROM users u WHERE u.id=? AND u.role='joueur' AND u.status='verifie' AND u.is_admin=0").get(p.data.to);
+    const to = await db.prepare("SELECT u.* FROM users u WHERE u.id=? AND u.role='joueur' AND u.status='verifie' AND u.is_admin=0 AND u.is_guest=0").get(p.data.to);
     if (!to) throw new HttpError(404, 'Joueur introuvable.');
     if (await db.prepare('SELECT 1 FROM contacts WHERE from_user=? AND to_user=?').get(me.id, to.id)) throw new HttpError(409, 'Tu as déjà envoyé une demande à ce joueur.');
     await db.prepare('INSERT INTO contacts (from_user, to_user, message) VALUES (?,?,?)').run(me.id, to.id, p.data.message);

@@ -2,7 +2,7 @@
 (function(){
 var $=function(s){return document.querySelector(s)};
 function esc(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-var ROLE={joueur:'Joueur',agent:'Agent',club:'Club ou académie'};
+var ROLE={invite:'Invité',joueur:'Joueur',agent:'Agent',club:'Club ou académie'};
 var STATUS={en_attente:['En cours de vérification','Ton profil sera visible par les autres membres une fois vérifié par l\'équipe Spora.'],verifie:['Profil vérifié','Ton profil est visible dans l\'annuaire.'],refuse:['Vérification refusée','Corrige ton profil ci-dessous : il repassera en vérification après enregistrement.']};
 var PLAN={gratuit:'Gratuit',standard:'Standard',premium:'Premium',elite:'Élite'};
 var P={},state={contacts:null},quiet=false;
@@ -27,13 +27,13 @@ function draw(){var h=$('#esp');if(!h)return;var u=Spora.user;
   +'<div class="jn-msg'+(u.status==='verifie'?'':' w')+'" style="margin-top:0"><b>'+st[0]+'.</b> '+esc(u.status_note||st[1])+'</div>'
   +(u.email_verified?'':'<div class="jn-msg w"><b>Adresse e-mail non confirmée.</b> Clique sur le lien reçu par e-mail. <button type="button" class="back" data-e="resend" style="background:none;border:0;color:var(--primary);font:inherit;font-weight:800;cursor:pointer">Renvoyer l\'e-mail</button></div>')
   +'</div>';
- o+='<div class="jn-card" id="espProf"><h2>Mon profil</h2><p class="lead">Ces informations alimentent ta fiche.</p><div id="espForm">Chargement…</div></div>';
- o+='<div class="jn-card" id="espVid"><h2>Mes vidéos</h2><p class="lead">Montre tes meilleures actions aux agents et aux clubs.</p><div id="espVidBody">Chargement…</div></div>';
- o+='<div class="jn-card"><h2>Mes mises en relation</h2><p class="lead">'+(u.role==='joueur'?'Les agents et clubs vérifiés qui souhaitent te contacter.':'Les demandes que tu as envoyées.')+'</p><div id="espCt">Chargement…</div></div>';
- o+='<div class="jn-card"><h2>Mon offre</h2><p class="lead">Offre actuelle : <b>'+plan+'</b>'+(u.plan!=='gratuit'&&u.plan_until?' · valable jusqu\'au '+esc(u.plan_until):'')+'</p><p style="color:var(--text2)">Le paiement en ligne n\'est pas encore ouvert. Pour passer à Standard, Premium ou Élite, écris à l\'équipe Spora : ton offre est activée dès réception du règlement.</p><p><a class="btn sm" href="#premium">Voir les offres</a> <a href="#accueil" data-scroll="#contact" style="margin-left:14px;color:var(--primary);font-weight:800">Contacter l\'équipe</a></p></div>';
+ if(u.role!=='invite')o+='<div class="jn-card" id="espProf"><h2>Mon profil</h2><p class="lead">Ces informations alimentent ta fiche.</p><div id="espForm">Chargement…</div></div>';
+ if(u.role!=='invite')o+='<div class="jn-card" id="espVid"><h2>Mes vidéos</h2><p class="lead">Montre tes meilleures actions aux agents et aux clubs.</p><div id="espVidBody">Chargement…</div></div>';
+ if(u.role!=='invite')o+='<div class="jn-card"><h2>Mes mises en relation</h2><p class="lead">'+(u.role==='joueur'?'Les agents et clubs vérifiés qui souhaitent te contacter.':'Les demandes que tu as envoyées.')+'</p><div id="espCt">Chargement…</div></div>';
+ if(u.role!=='invite')o+='<div class="jn-card"><h2>Mon offre</h2><p class="lead">Offre actuelle : <b>'+plan+'</b>'+(u.plan!=='gratuit'&&u.plan_until?' · valable jusqu\'au '+esc(u.plan_until):'')+'</p><p style="color:var(--text2)">Le paiement en ligne n\'est pas encore ouvert. Pour passer à Standard, Premium ou Élite, écris à l\'équipe Spora : ton offre est activée dès réception du règlement.</p><p><a class="btn sm" href="#premium">Voir les offres</a> <a href="#accueil" data-scroll="#contact" style="margin-left:14px;color:var(--primary);font-weight:800">Contacter l\'équipe</a></p></div>';
  o+='<div class="jn-card"><h2>Mes données</h2><p class="lead">Tu peux télécharger ou supprimer toutes tes données à tout moment.</p><p><a class="btn sm" href="/api/me/export" download>Télécharger mes données</a> <button type="button" class="back" data-e="out" style="margin-left:14px;background:none;border:0;color:var(--text2);font:inherit;font-weight:800;cursor:pointer">Se déconnecter</button></p>'
   +'<details style="margin-top:18px"><summary style="cursor:pointer;font-weight:800;color:#e5484d">Supprimer mon compte</summary><p class="lead" style="margin-top:10px">Suppression définitive du compte, du profil, de la photo et des échanges. Saisis ton mot de passe pour confirmer.</p><div class="jn-g"><div class="full"><input type="password" id="delpw" placeholder="Mot de passe" autocomplete="current-password"></div></div><div class="jn-act"><span></span><button type="button" class="btn" data-e="del" style="background:#e5484d">Supprimer définitivement</button></div><div class="jn-msg" id="delMsg" hidden></div></details></div>';
- h.innerHTML=o;loadProfile();loadContacts();loadVideos()}
+ h.innerHTML=o;if(u.role!=='invite'){loadProfile();loadContacts();loadVideos()}}
 
 function loadProfile(){Spora.api('GET','/me/profile').then(function(j){P=j.profile||{};drawForm(j.user)},function(e){$('#espForm').textContent=e.message})}
 var DATA={};

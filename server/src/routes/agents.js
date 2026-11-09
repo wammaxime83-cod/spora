@@ -4,7 +4,7 @@ const db = require('../db');
 const { HttpError, shortName } = require('../util');
 
 const router = express.Router();
-const SELECT = `SELECT u.id, u.name, p.data FROM users u JOIN profiles p ON p.user_id = u.id WHERE u.role='agent' AND u.status='verifie' AND u.is_admin=0`;
+const SELECT = `SELECT u.id, u.name, p.data FROM users u JOIN profiles p ON p.user_id = u.id WHERE u.role='agent' AND u.status='verifie' AND u.is_admin=0 AND u.is_guest=0`;
 const parse = r => { try { return JSON.parse(r.data || '{}'); } catch { return {}; } };
 
 // Seuls l'administrateur et les agents / clubs vérifiés peuvent ouvrir une fiche.

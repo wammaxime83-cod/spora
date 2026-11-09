@@ -12,7 +12,7 @@ router.get('/stats', async (req, res) => {
   const n = async (sql) => (await db.prepare(sql).get()).n;
   res.json({
     users: await n('SELECT COUNT(*) n FROM users'),
-    joueurs: await n("SELECT COUNT(*) n FROM users WHERE role='joueur'"),
+    joueurs: await n("SELECT COUNT(*) n FROM users WHERE role='joueur' AND is_guest=0"),
     agents: await n("SELECT COUNT(*) n FROM users WHERE role='agent'"),
     clubs: await n("SELECT COUNT(*) n FROM users WHERE role='club'"),
     en_attente: await n("SELECT COUNT(*) n FROM users WHERE status='en_attente'"),
@@ -24,14 +24,14 @@ router.get('/stats', async (req, res) => {
 
 router.get('/users', async (req, res) => {
   const st = ['en_attente', 'verifie', 'refuse'].includes(req.query.status) ? req.query.status : null;
-  const rows = await db.prepare(`SELECT id,email,role,name,tel,status,status_note,plan,plan_until,email_verified,created_at,last_login FROM users
+  const rows = await db.prepare(`SELECT id,email,CASE WHEN is_guest=1 THEN 'invite' ELSE role END AS role,name,tel,status,status_note,plan,plan_until,email_verified,created_at,last_login FROM users
     ${st ? 'WHERE status = ?' : ''} ORDER BY created_at DESC LIMIT 200`).all(...(st ? [st] : []));
   res.json({ users: rows });
 });
 
 router.get('/users/:id', async (req, res, next) => {
   try {
-    const u = await db.prepare('SELECT id,email,role,name,tel,status,status_note,plan,plan_until,email_verified,created_at FROM users WHERE id=?').get(Number(req.params.id));
+    const u = await db.prepare('SELECT id,email,CASE WHEN is_guest=1 THEN \'invite\' ELSE role END AS role,name,tel,status,status_note,plan,plan_until,email_verified,created_at FROM users WHERE id=?').get(Number(req.params.id));
     if (!u) throw new HttpError(404, 'Introuvable.');
     const p = await db.prepare('SELECT data,has_photo,minor FROM profiles WHERE user_id=?').get(u.id);
     res.json({ user: u, profile: p ? { ...JSON.parse(p.data), has_photo: !!p.has_photo, minor: !!p.minor } : null });
