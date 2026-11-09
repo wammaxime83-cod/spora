@@ -45,6 +45,8 @@ function createApp() {
 
   const api = express.Router();
   api.use(rateLimit({ windowMs: 60 * 1000, limit: 300, standardHeaders: true, legacyHeaders: false }));
+  // Les réponses de l'API dépendent de la session : jamais de cache partagé (CDN, proxy) ni de cache du navigateur.
+  api.use((req, res, next) => { res.set({ 'Cache-Control': 'private, no-store', Vary: 'Cookie' }); next(); });
   api.use(sameOrigin);
   api.use('/auth', require('./routes/auth'));
   const videos = require('./routes/videos');

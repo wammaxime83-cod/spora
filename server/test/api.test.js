@@ -27,6 +27,7 @@ const player = (over = {}) => ({ photo: PNG, email: 'moussa@test.cm', name: 'Mou
 test('santé + page d\'accueil + en-têtes de sécurité', async () => {
   const c = new Client();
   assert.equal((await c.req('GET', '/api/health')).status, 200);
+  const me0 = await c.req('GET', '/api/auth/me'); assert.match(me0.headers.get('cache-control'), /no-store/); assert.match(me0.headers.get('vary'), /Cookie/i);
   const r = await fetch(base + '/');
   const html = await r.text();
   assert.match(html, /Spora/); assert.ok(!html.includes('{{SITE_URL}}'));
