@@ -26,7 +26,6 @@ function draw(){var h=$('#esp');if(!h)return;var u=Spora.user;
  var o='<div class="jn-card"><h2>Bonjour '+esc(u.name.split(' ')[0])+'</h2><p class="lead">'+esc(ROLE[u.role])+' · '+esc(u.email)+'</p>'
   +'<div class="jn-msg'+(u.status==='verifie'?'':' w')+'" style="margin-top:0"><b>'+st[0]+'.</b> '+esc(u.status_note||st[1])+'</div>'
   +(u.email_verified?'':'<div class="jn-msg w"><b>Adresse e-mail non confirmée.</b> Clique sur le lien reçu par e-mail. <button type="button" class="back" data-e="resend" style="background:none;border:0;color:var(--primary);font:inherit;font-weight:800;cursor:pointer">Renvoyer l\'e-mail</button></div>')
-  +(u.is_admin?'<p style="margin-top:14px"><a href="/admin" style="color:var(--primary);font-weight:800">Ouvrir l\'administration →</a></p>':'')
   +'</div>';
  o+='<div class="jn-card" id="espProf"><h2>Mon profil</h2><p class="lead">Ces informations alimentent ta fiche.</p><div id="espForm">Chargement…</div></div>';
  o+='<div class="jn-card" id="espVid"><h2>Mes vidéos</h2><p class="lead">Montre tes meilleures actions aux agents et aux clubs.</p><div id="espVidBody">Chargement…</div></div>';

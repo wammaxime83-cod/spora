@@ -74,7 +74,7 @@ me.delete('/videos/:id', async (req, res) => {
 // ---- Fil public (Highlights) : vidéos des joueurs vérifiés ----
 const feed = express.Router();
 const interLimiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 60, standardHeaders: true, legacyHeaders: false, message: { error: 'Trop d\'actions. Réessaie dans quelques minutes.' } });
-const publicVideo = id => db.get("SELECT v.id FROM videos v JOIN users u ON u.id=v.user_id WHERE v.id=? AND u.status='verifie'", [id]);
+const publicVideo = id => db.get("SELECT v.id FROM videos v JOIN users u ON u.id=v.user_id WHERE v.id=? AND u.status='verifie' AND u.is_admin=0", [id]);
 
 feed.get('/', async (req, res) => {
   const uid = req.user ? req.user.id : 0;
@@ -83,7 +83,7 @@ feed.get('/', async (req, res) => {
       (SELECT COUNT(*) FROM video_comments c WHERE c.video_id=v.id) AS comments,
       (SELECT COUNT(*) FROM video_likes l WHERE l.video_id=v.id AND l.user_id=?) AS liked
     FROM videos v JOIN users u ON u.id=v.user_id JOIN profiles p ON p.user_id=u.id
-    WHERE u.status='verifie' ORDER BY v.id DESC LIMIT 100`, [uid]);
+    WHERE u.status='verifie' AND u.is_admin=0 ORDER BY v.id DESC LIMIT 100`, [uid]);
   res.set('Cache-Control', 'no-store');
   res.json({ videos: rows.map(r => ({ ...item(r), likes: r.likes, comments: r.comments, liked: !!r.liked, player: { id: r.uid, role: r.role, name: shortName(r.name), pos: r.pos, nat: r.nat } })) });
 });
