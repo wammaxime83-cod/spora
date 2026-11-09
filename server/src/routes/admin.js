@@ -93,4 +93,22 @@ router.get('/guests', async (req, res) => {
   res.json({ guests: await db.prepare('SELECT * FROM guests ORDER BY id DESC LIMIT 500').all() });
 });
 
+// ---- Supervision des conversations (lecture seule, consultations journalisées) ----
+router.get('/conversations', async (req, res) => {
+  const rows = await db.all(`SELECT c.id, c.status, c.created_at, fu.name AS from_name, fu.role AS from_role, tu.name AS to_name, tu.role AS to_role,
+      (SELECT COUNT(*) FROM chat_messages m WHERE m.contact_id=c.id) AS n,
+      (SELECT MAX(created_at) FROM chat_messages m WHERE m.contact_id=c.id) AS last_at
+    FROM contacts c JOIN users fu ON fu.id=c.from_user JOIN users tu ON tu.id=c.to_user ORDER BY COALESCE(last_at, c.created_at) DESC LIMIT 300`);
+  res.json({ conversations: rows });
+});
+router.get('/conversations/:id', async (req, res, next) => {
+  try {
+    const c = await db.get(`SELECT c.*, fu.name AS from_name, tu.name AS to_name FROM contacts c JOIN users fu ON fu.id=c.from_user JOIN users tu ON tu.id=c.to_user WHERE c.id=?`, [Number(req.params.id)]);
+    if (!c) throw new HttpError(404, 'Introuvable.');
+    const msgs = await db.all('SELECT id, sender_id, body, created_at FROM chat_messages WHERE contact_id=? ORDER BY id LIMIT 1000', [c.id]);
+    await audit(req.user.id, 'chat_viewed', c.id);
+    res.json({ from: c.from_name, to: c.to_name, first_message: c.message, status: c.status, messages: msgs.map(m => ({ id: m.id, author: m.sender_id === c.from_user ? c.from_name : c.to_name, body: m.body, created_at: m.created_at })) });
+  } catch (e) { next(e); }
+});
+
 module.exports = router;

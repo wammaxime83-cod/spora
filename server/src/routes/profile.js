@@ -1,6 +1,7 @@
 'use strict';
 const express = require('express');
 const db = require('../db');
+const { shortName } = require('../util');
 const V = require('../validators');
 const { HttpError, ageFrom } = require('../util');
 const { requireAuth, audit } = require('../middleware');
@@ -53,22 +54,20 @@ router.get('/export', async (req, res) => {
   res.json({ exported_at: new Date().toISOString(), account: safe, profile: await loadProfile(u.id), contacts });
 });
 
-// Mes mises en relation (envoyées et reçues)
+// Mes mises en relation (envoyées et reçues). Les coordonnées (e-mail, téléphone) ne sont JAMAIS transmises :
+// une fois la demande acceptée, les échanges passent par le chat de Spora.
 router.get('/contacts', async (req, res) => {
   const u = req.user;
-  const rows = await db.prepare(`SELECT c.*, fu.name AS from_name, fu.role AS from_role, fu.email AS from_email, fu.tel AS from_tel,
-      tu.name AS to_name, tu.role AS to_role, tu.email AS to_email, tu.tel AS to_tel
+  const rows = await db.prepare(`SELECT c.*, fu.name AS from_name, fu.role AS from_role, tu.name AS to_name, tu.role AS to_role,
+      (SELECT COUNT(*) FROM chat_messages m WHERE m.contact_id=c.id AND m.sender_id<>? AND m.read_at IS NULL) AS unread
     FROM contacts c JOIN users fu ON fu.id=c.from_user JOIN users tu ON tu.id=c.to_user
-    WHERE c.from_user=? OR c.to_user=? ORDER BY c.created_at DESC LIMIT 200`).all(u.id, u.id);
+    WHERE c.from_user=? OR c.to_user=? ORDER BY c.created_at DESC LIMIT 200`).all(u.id, u.id, u.id);
   res.set('Cache-Control', 'no-store');
   res.json({ contacts: rows.map(r => {
     const incoming = r.to_user === u.id;
-    const other = incoming ? { id: r.from_user, name: r.from_name, role: r.from_role, email: r.from_email, tel: r.from_tel }
-                           : { id: r.to_user, name: r.to_name, role: r.to_role, email: r.to_email, tel: r.to_tel };
-    // Le joueur voit les coordonnées de qui le contacte ; l'inverse n'est vrai qu'après son acceptation.
-    const reveal = incoming || r.status === 'accepte';
-    return { id: r.id, direction: incoming ? 'recu' : 'envoye', status: r.status, message: r.message, created_at: r.created_at,
-      other: { id: other.id, name: other.name, role: other.role, email: reveal ? other.email : null, tel: reveal ? other.tel : null } };
+    const other = incoming ? { id: r.from_user, name: r.from_name, role: r.from_role } : { id: r.to_user, name: r.to_name, role: r.to_role };
+    return { id: r.id, direction: incoming ? 'recu' : 'envoye', status: r.status, message: r.message, created_at: r.created_at, unread: r.unread || 0,
+      other: { id: other.id, name: other.role === 'joueur' ? other.name : shortName(other.name), role: other.role } };
   }) });
 });
 

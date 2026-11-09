@@ -81,7 +81,7 @@ contactsRouter.post('/', requireAuth, contactLimiter, async (req, res, next) => 
     if (await db.prepare('SELECT 1 FROM contacts WHERE from_user=? AND to_user=?').get(me.id, to.id)) throw new HttpError(409, 'Tu as déjà envoyé une demande à ce joueur.');
     await db.prepare('INSERT INTO contacts (from_user, to_user, message) VALUES (?,?,?)').run(me.id, to.id, p.data.message);
     await audit(me.id, 'contact_sent', to.id);
-    sendMail(to.email, 'Nouvelle demande sur Spora', `Bonjour ${to.name},\n\n${me.name} (${me.role}) souhaite entrer en contact avec toi sur Spora. Connecte-toi pour lire le message et répondre :\n${require('../config').siteUrl}/#espace\n`).catch(() => {});
+    sendMail(to.email, 'Nouvelle demande sur Spora', `Bonjour ${to.name},\n\n${shortName(me.name)} (${me.role}) souhaite entrer en contact avec toi sur Spora. Connecte-toi pour lire le message et répondre :\n${require('../config').siteUrl}/#espace\n`).catch(() => {});
     res.status(201).json({ ok: true });
   } catch (e) { next(e); }
 });

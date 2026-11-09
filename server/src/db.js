@@ -100,6 +100,14 @@ const SCHEMA = [
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   answered_at TEXT,
   UNIQUE (from_user, to_user))`,
+`CREATE TABLE IF NOT EXISTS chat_messages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  contact_id INTEGER NOT NULL,
+  sender_id INTEGER NOT NULL,
+  body TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  read_at TEXT)`,
+`CREATE INDEX IF NOT EXISTS idx_chat_contact ON chat_messages(contact_id, id)`,
 `CREATE TABLE IF NOT EXISTS guests (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   country TEXT NOT NULL, who TEXT, interests TEXT,
@@ -119,8 +127,8 @@ async function purge() {
 // Supprime un compte et tout ce qui lui est lié (sans dépendre des clés étrangères).
 db.deleteUser = id => db.tx(async t => {
   for (const sql of ['DELETE FROM video_likes WHERE video_id IN (SELECT id FROM videos WHERE user_id=?)', 'DELETE FROM video_comments WHERE video_id IN (SELECT id FROM videos WHERE user_id=?)', 'DELETE FROM video_likes WHERE user_id=?', 'DELETE FROM video_comments WHERE user_id=?', 'DELETE FROM videos WHERE user_id=?', 'DELETE FROM photos WHERE user_id=?', 'DELETE FROM sessions WHERE user_id=?', 'DELETE FROM email_tokens WHERE user_id=?',
-    'DELETE FROM contacts WHERE from_user=? OR to_user=?', 'DELETE FROM profiles WHERE user_id=?']) {
-    await t.run(sql, sql.includes('OR') ? [id, id] : [id]);
+    'DELETE FROM chat_messages WHERE contact_id IN (SELECT id FROM contacts WHERE from_user=? OR to_user=?)', 'DELETE FROM contacts WHERE from_user=? OR to_user=?', 'DELETE FROM profiles WHERE user_id=?']) {
+    await t.run(sql, sql.includes(' OR ') ? [id, id] : [id]);
   }
   return t.run('DELETE FROM users WHERE id=?', [id]);
 });

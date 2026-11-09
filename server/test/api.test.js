@@ -84,9 +84,9 @@ test('profils vérifiés listés, contact, acceptation, coordonnées', async () 
   assert.equal((await agent.req('POST', '/api/contacts', { to: id, message: 'Essai possible le mois prochain ?' })).status, 409);
   let cs = await agent.req('GET', '/api/me/contacts'); assert.equal(cs.body.contacts[0].other.email, null);
   const inbox = await pl.req('GET', '/api/me/contacts');
-  assert.equal(inbox.body.contacts[0].other.email, 'agent@test.cm');
+  assert.equal(inbox.body.contacts[0].other.email, undefined); // plus de coordonnées : tout passe par le chat
   await pl.req('PUT', '/api/me/contacts/' + inbox.body.contacts[0].id, { status: 'accepte' });
-  cs = await agent.req('GET', '/api/me/contacts'); assert.equal(cs.body.contacts[0].other.email, 'pro@test.cm');
+  cs = await agent.req('GET', '/api/me/contacts'); assert.equal(cs.body.contacts[0].other.email, undefined);
 });
 
 test('accès admin refusé aux non-admins, invité, export, suppression', async () => {
@@ -242,4 +242,36 @@ test('agents : liste publique sans nom de famille, fiche réservée', async () =
   assert.equal((await pl.req('GET', '/api/agents')).body.canView, false);
   const full = await admin.req('GET', '/api/agents/' + id); assert.equal(full.status, 200); assert.equal(full.body.agent.name, 'Moussa Diallo');
   assert.equal((await ag.req('GET', '/api/agents/' + id)).body.agent.name, 'Moussa D.');
+});
+
+test('chat : ouvert après acceptation, sans coordonnées, supervisé par l\'admin', async () => {
+  const admin = new Client(); const ag = new Client(); const pl = new Client(); const stranger = new Client();
+  await admin.req('POST', '/api/auth/login', { email: 'boss@spora.test', password: 'Sup3r-Secret!' });
+  const ra = await ag.req('POST', '/api/auth/register', { email: 'agentchat@test.cm', name: 'Awa Camara', tel: '+237 6 99 99 99 99', password: 'Sup3r-Secret!', accept_terms: true, role: 'agent',
+    profile: { org: 'Agence Chat', ctr: ['Cameroun'], exp: '2 à 5 ans', lic: 'Pas encore de licence', dom: ['Joueurs'], ptel: '+237 6 99 99 99 99' } });
+  const rp = await pl.req('POST', '/api/auth/register', player({ email: 'plchat@test.cm', name: 'Eric Joueur' }));
+  await stranger.req('POST', '/api/auth/register', player({ email: 'strangerchat@test.cm', name: 'Intrus Total' }));
+  await admin.req('PUT', `/api/admin/users/${ra.body.user.id}/status`, { status: 'verifie' });
+  await admin.req('PUT', `/api/admin/users/${rp.body.user.id}/status`, { status: 'verifie' });
+  assert.equal((await ag.req('POST', '/api/contacts', { to: rp.body.user.id, message: 'Bonjour, je suis intéressé par ton profil.' })).status, 201);
+  const cid = (await pl.req('GET', '/api/me/contacts')).body.contacts[0].id;
+  // pas de chat tant que non accepté
+  assert.equal((await pl.req('GET', `/api/chat/${cid}/messages`)).status, 403);
+  assert.equal((await pl.req('PUT', `/api/me/contacts/${cid}`, { status: 'accepte' })).status, 200);
+  // aucune coordonnée dans les réponses, des deux côtés
+  for (const c of [pl, ag]) { const j = JSON.stringify((await c.req('GET', '/api/me/contacts')).body); assert.ok(!j.includes('@') && !j.includes('+237') && !j.includes('Camara'), j); }
+  assert.equal((await ag.req('POST', `/api/chat/${cid}/messages`, { body: 'Salut Eric !' })).status, 201);
+  assert.equal((await pl.req('GET', '/api/me/contacts')).body.contacts[0].unread, 1);
+  assert.equal((await pl.req('POST', `/api/chat/${cid}/messages`, { body: 'Salut, avec plaisir.' })).status, 201);
+  const msgs = await pl.req('GET', `/api/chat/${cid}/messages`); assert.equal(msgs.body.messages.length, 2); assert.equal(msgs.body.messages[0].mine, false);
+  assert.equal((await pl.req('GET', '/api/me/contacts')).body.contacts[0].unread, 0);
+  assert.equal((await pl.req('POST', `/api/chat/${cid}/messages`, { body: '   ' })).status, 400);
+  // un tiers ne peut ni lire ni écrire
+  assert.equal((await stranger.req('GET', `/api/chat/${cid}/messages`)).status, 404);
+  assert.equal((await stranger.req('POST', `/api/chat/${cid}/messages`, { body: 'hop' })).status, 404);
+  assert.equal((await new Client().req('GET', `/api/chat/${cid}/messages`)).status, 401);
+  // l'admin voit tout
+  const list = await admin.req('GET', '/api/admin/conversations'); assert.ok(list.body.conversations.find(c => c.id === cid && c.n === 2));
+  const det = await admin.req('GET', `/api/admin/conversations/${cid}`); assert.equal(det.body.messages.length, 2); assert.equal(det.body.messages[0].author, 'Awa Camara');
+  assert.equal((await pl.req('GET', `/api/admin/conversations/${cid}`)).status, 403);
 });

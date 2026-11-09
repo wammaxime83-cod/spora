@@ -98,9 +98,28 @@ function loadContacts(){Spora.api('GET','/me/contacts').then(function(j){var h='
  if(!l.length)h='<p style="color:var(--text2)">Aucune demande pour le moment.</p>';
  l.forEach(function(c){var o=c.other,lab={envoye:'En attente',accepte:'Acceptée',refuse:'Refusée'}[c.status];
   h+='<div class="jn-msg" style="margin-top:10px"><b>'+(c.direction==='recu'?esc(o.name)+' ('+esc(ROLE[o.role]||o.role)+') t\'a écrit':'Toi → '+esc(o.name))+'</b> · '+lab+'<br>'+esc(c.message)
-   +((o.email||o.tel)?'<br><b>Coordonnées :</b> '+esc([o.email,o.tel].filter(Boolean).join(' · ')):'')
+   +(c.status==='accepte'?'<div style="margin-top:10px"><button type="button" class="btn sm" data-chat="'+c.id+'" data-nm="'+esc(o.name)+'" style="border:0;cursor:pointer">💬 Ouvrir le chat'+(c.unread?' · '+c.unread+' nouveau'+(c.unread>1?'x':''):'')+'</button><small style="display:block;margin-top:6px;color:var(--text2)">Vos échanges se font ici, sur Spora. Vos e-mails et numéros restent privés.</small></div>':'')
    +(c.direction==='recu'&&c.status==='envoye'?'<div style="margin-top:10px;display:flex;gap:10px"><button type="button" class="btn sm" data-ct="'+c.id+'" data-s="accepte" style="border:0;cursor:pointer">Accepter</button><button type="button" class="back" data-ct="'+c.id+'" data-s="refuse" style="background:none;border:0;color:var(--text2);font:inherit;font-weight:800;cursor:pointer">Refuser</button></div>':'')+'</div>'});
  $('#espCt').innerHTML=h},function(e){$('#espCt').textContent=e.message})}
+
+/* ---- chat entre un joueur et un agent / club (après acceptation) ---- */
+var cdlg=document.createElement('dialog');cdlg.style.cssText='border:1px solid var(--border);border-radius:22px;padding:0;max-width:520px;width:calc(100% - 32px);background:var(--surface);color:var(--text);overflow:hidden';
+cdlg.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border)"><b id="chT"></b><button type="button" id="chX" style="background:none;border:0;color:var(--text2);font:inherit;font-weight:800;cursor:pointer">Fermer</button></div><div id="chL" style="height:min(55vh,420px);overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:8px;background:var(--bg)"></div><form id="chF" style="display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--border)"><input id="chI" type="text" maxlength="1000" placeholder="Écris ton message…" autocomplete="off" style="flex:1;min-width:0;border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:50px;padding:10px 16px;font:inherit"><button type="submit" class="btn sm" style="border:0;cursor:pointer">Envoyer</button></form><p id="chE" hidden style="margin:0;padding:0 18px 12px;color:#c0392b;font-size:.9rem"></p>';
+document.body.appendChild(cdlg);
+var chId=null,chTimer=null,chLast=-1;
+function chStop(){clearInterval(chTimer);chTimer=null}
+document.getElementById('chX').addEventListener('click',function(){cdlg.close()});
+cdlg.addEventListener('close',function(){chStop();chId=null;if(typeof loadContacts==='function'&&document.getElementById('espCt'))loadContacts()});
+function chTime(t){var d=new Date(String(t).replace(' ','T')+'Z');return isNaN(d)?'':d.toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
+function chLoad(force){if(!chId)return;Spora.api('GET','/chat/'+chId+'/messages').then(function(j){var m=j.messages||[],last=m.length?m[m.length-1].id:0;if(!force&&last===chLast)return;chLast=last;
+ var L=document.getElementById('chL'),atEnd=L.scrollHeight-L.scrollTop-L.clientHeight<80||force;
+ L.innerHTML=m.length?m.map(function(x){return '<div style="align-self:'+(x.mine?'flex-end':'flex-start')+';max-width:80%;background:'+(x.mine?'var(--primary)':'var(--surface)')+';color:'+(x.mine?'#fff':'var(--text)')+';border:1px solid var(--border);border-radius:16px;padding:8px 12px;overflow-wrap:anywhere;white-space:pre-wrap">'+esc(x.body)+'<small style="display:block;opacity:.7;font-size:.7rem;margin-top:2px">'+chTime(x.created_at)+'</small></div>'}).join(''):'<p style="color:var(--text2);margin:auto;text-align:center">Dis bonjour pour démarrer la conversation.</p>';
+ if(atEnd)L.scrollTop=L.scrollHeight},function(er){document.getElementById('chL').textContent=er.message;chStop()})}
+function openChat(id,nm){chId=id;chLast=-1;document.getElementById('chT').textContent='Chat avec '+nm;document.getElementById('chL').textContent='Chargement…';document.getElementById('chE').hidden=true;
+ if(cdlg.showModal)cdlg.showModal();else cdlg.setAttribute('open','');chLoad(true);chStop();chTimer=setInterval(function(){chLoad(false)},4000)}
+document.getElementById('chF').addEventListener('submit',function(e){e.preventDefault();var i=document.getElementById('chI'),t=i.value.trim(),er=document.getElementById('chE');if(!t||!chId)return;er.hidden=true;
+ Spora.api('POST','/chat/'+chId+'/messages',{body:t}).then(function(){i.value='';chLoad(true)},function(x){er.textContent=x.message;er.hidden=false})});
+document.addEventListener('click',function(e){var t=e.target.closest('[data-chat]');if(t)openChat(+t.dataset.chat,t.dataset.nm||'')});
 
 document.addEventListener('click',function(e){var t=e.target.closest('[data-e],[data-ct],[data-contact],[data-vdel]');if(!t)return;
  if(t.dataset.vdel){t.disabled=true;Spora.api('DELETE','/me/videos/'+t.dataset.vdel).then(loadVideos,function(er){msg('#vmsg',er.message,false)});return}
