@@ -13,7 +13,7 @@ const { savePhoto, checkPhoto } = require('../photos');
 const router = express.Router();
 const DUMMY = bcrypt.hashSync('spora-dummy-password', 10); // évite de révéler si un e-mail existe (temps de réponse)
 
-const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: true, legacyHeaders: false, message: { error: 'Trop de tentatives. Réessaie dans quelques minutes.' } });
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 30, skipSuccessfulRequests: true, standardHeaders: true, legacyHeaders: false, message: { error: 'Trop de tentatives. Réessaie dans quelques minutes.' } });
 const registerLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: config.registerLimit, standardHeaders: true, legacyHeaders: false, message: { error: 'Trop d\'inscriptions depuis cette adresse. Réessaie plus tard.' } });
 
 function publicUser(u) {

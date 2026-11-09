@@ -22,7 +22,7 @@ const config = {
   // Derrière un proxy (Render, Railway, Nginx...), mettre TRUST_PROXY=1
   trustProxy: env.TRUST_PROXY || (isProd ? '1' : ''),
   cookieSecure: env.COOKIE_SECURE ? env.COOKIE_SECURE === 'true' : isProd,
-  registerLimit: num(env.REGISTER_LIMIT_PER_HOUR, 10),
+  registerLimit: num(env.REGISTER_LIMIT_PER_HOUR, 30),
   bcryptRounds: num(env.BCRYPT_ROUNDS, 12),
   adminEmails: (env.ADMIN_EMAILS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean),
   smtpUrl: env.SMTP_URL || '',
