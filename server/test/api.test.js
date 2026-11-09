@@ -223,3 +223,23 @@ test('joueur : photo de profil obligatoire', async () => {
   const rm = await c.req('PUT', '/api/me/profile', { profile: { dob: '2000-03-04', nat: 'Cameroun', res: 'Cameroun', city: 'Douala', pos: 'Attaquant', foot: 'Droit', lvl: 'Amateur' }, remove_photo: true });
   assert.equal(rm.status, 400);
 });
+
+test('agents : liste publique sans nom de famille, fiche réservée', async () => {
+  const admin = new Client(); const ag = new Client(); const pl = new Client(); const vis = new Client();
+  await admin.req('POST', '/api/auth/login', { email: 'boss@spora.test', password: 'Sup3r-Secret!' });
+  const r = await ag.req('POST', '/api/auth/register', { email: 'agentx@test.cm', name: 'Moussa Diallo', tel: '+237 6 70 00 00 01', password: 'Sup3r-Secret!', accept_terms: true, role: 'agent',
+    profile: { org: 'Agence Test', ctr: ['Cameroun'], exp: '2 à 5 ans', lic: 'Pas encore de licence', dom: ['Joueurs'], ptel: '+237 6 70 00 00 01' } });
+  assert.equal(r.status, 201, JSON.stringify(r.body));
+  await pl.req('POST', '/api/auth/register', player({ email: 'plx@test.cm', name: 'Jo Joueur' }));
+  const before = (await vis.req('GET', '/api/agents')).body.agents.length; // pas vérifié : invisible
+  await admin.req('PUT', `/api/admin/users/${r.body.user.id}/status`, { status: 'verifie' });
+  const list = await vis.req('GET', '/api/agents');
+  assert.equal(list.body.agents.length, before + 1); const mine = list.body.agents.find(a => a.name === 'Moussa D.'); assert.ok(mine); assert.equal(list.body.canView, false);
+  assert.ok(!JSON.stringify(list.body).includes('Diallo') && !JSON.stringify(list.body).includes('@') && !JSON.stringify(list.body).includes('+237'));
+  const id = mine.id;
+  assert.equal((await vis.req('GET', '/api/agents/' + id)).status, 403);
+  assert.equal((await pl.req('GET', '/api/agents/' + id)).status, 403);
+  assert.equal((await pl.req('GET', '/api/agents')).body.canView, false);
+  const full = await admin.req('GET', '/api/agents/' + id); assert.equal(full.status, 200); assert.equal(full.body.agent.name, 'Moussa Diallo');
+  assert.equal((await ag.req('GET', '/api/agents/' + id)).body.agent.name, 'Moussa D.');
+});

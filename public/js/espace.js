@@ -13,6 +13,7 @@ Spora.on(function(u){
  if(l){l.textContent=u?'Mon espace':'Connexion';l.setAttribute('href',u?'#espace':'#connexion')}
  if(c){c.textContent=u?'Se déconnecter':'Créer un compte';if(u){c.setAttribute('href','#accueil');c.dataset.out='1'}else{c.setAttribute('href','#inscription');delete c.dataset.out}}
  if(window.__refreshPlayers)window.__refreshPlayers();
+ if(window.__refreshAgents)window.__refreshAgents();
  if(!quiet&&location.hash.split('?')[0]==='#espace')draw();
 });
 document.addEventListener('click',function(e){var b=e.target.closest('[data-out]');if(!b)return;e.preventDefault();logout()});
@@ -136,6 +137,14 @@ function openProfile(id){pdlg.innerHTML='<p style="margin:0">Chargement…</p>';
   pdlg.innerHTML='<div style="display:flex;gap:14px;align-items:center;margin-bottom:14px">'+(p.photo?'<img alt="" src="'+esc(p.photo)+'" style="width:76px;height:76px;border-radius:50%;object-fit:cover">':'<span style="width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:var(--primary);color:#fff;font-size:1.8rem;font-weight:800">'+esc(ini)+'</span>')+'<div style="flex:1;min-width:0"><h2 style="margin:0;font-size:1.35rem">'+esc(p.name)+' <span title="Profil vérifié" style="color:var(--primary)">✓</span></h2><small style="color:var(--text2);font-weight:600">Joueur vérifié Spora'+(p.featured?' · ★ Mis en avant':'')+'</small></div><button type="button" data-pclose aria-label="Fermer" style="background:none;border:0;color:var(--text2);font:inherit;font-weight:800;cursor:pointer;align-self:flex-start">✕</button></div>'
    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">'+rows.map(function(r){return '<div style="background:var(--surface2);border-radius:12px;padding:10px 12px"><small style="color:var(--text2);font-weight:700;display:block">'+r[0]+'</small><b>'+esc(r[1])+'</b></div>'}).join('')+'</div>'
    +(p.bio?'<p style="margin:0 0 14px;overflow-wrap:anywhere">'+esc(p.bio)+'</p>':'')+'<div style="display:flex;flex-direction:column;gap:10px">'+act+'</div>'},function(er){pdlg.innerHTML='<p style="margin:0 0 12px">'+esc(er.message||'Profil introuvable.')+'</p><button type="button" data-pclose class="btn ghost" style="cursor:pointer">Fermer</button>'})}
+
+/* ---- fiche agent (admin, agents et clubs vérifiés uniquement) ---- */
+function openAgent(id){pdlg.innerHTML='<p style="margin:0">Chargement…</p>';if(pdlg.showModal)pdlg.showModal();else pdlg.setAttribute('open','');
+ Spora.api('GET','/agents/'+id).then(function(j){var a=j.agent;
+  var rows=[['Pays d’activité',(a.ctr||[]).join(', ')],['Expérience',a.exp],['Licence',a.lic],['Organisation',a.org],['Domaines',(a.dom||[]).join(', ')]].filter(function(r){return r[1]});
+  pdlg.innerHTML='<div style="display:flex;gap:14px;align-items:center;margin-bottom:14px"><div style="flex:1;min-width:0"><h2 style="margin:0;font-size:1.35rem">'+esc(a.name)+' <span title="Agent vérifié" style="color:var(--primary)">✓</span></h2><small style="color:var(--text2);font-weight:600">Agent vérifié Spora</small></div><button type="button" data-pclose aria-label="Fermer" style="background:none;border:0;color:var(--text2);font:inherit;font-weight:800;cursor:pointer;align-self:flex-start">✕</button></div>'
+   +'<div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px">'+rows.map(function(r){return '<div style="background:var(--surface2);border-radius:12px;padding:10px 12px"><small style="color:var(--text2);font-weight:700;display:block">'+r[0]+'</small><b>'+esc(r[1])+'</b></div>'}).join('')+'</div>'+(a.bio?'<p style="margin:0 0 14px;overflow-wrap:anywhere">'+esc(a.bio)+'</p>':'')+'<button type="button" data-pclose class="btn ghost" style="cursor:pointer;width:100%">Fermer</button>'},function(er){pdlg.innerHTML='<p style="margin:0 0 12px">'+esc(er.message||'Profil introuvable.')+'</p><button type="button" data-pclose class="btn ghost" style="cursor:pointer">Fermer</button>'})}
+document.addEventListener('click',function(e){var t=e.target.closest('[data-aid]');if(t)openAgent(t.dataset.aid)});
 
 /* ---- vidéos d'un joueur (depuis l'annuaire) ---- */
 var vdlg=document.createElement('dialog');vdlg.style.cssText='border:1px solid var(--border);border-radius:22px;padding:20px;max-width:520px;width:calc(100% - 32px);background:var(--surface);color:var(--text)';

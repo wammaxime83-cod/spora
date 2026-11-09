@@ -52,6 +52,7 @@ function createApp() {
   api.use('/me', videos.me);
   api.use('/videos', videos.feed);
   const players = require('./routes/players');
+  api.use('/agents', require('./routes/agents'));
   api.use('/players', players);
   api.use('/contacts', players.contacts);
   api.use('/guest', require('./routes/guests'));
