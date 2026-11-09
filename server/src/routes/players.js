@@ -20,7 +20,8 @@ function card(row, full) {
     city: row.city, photo: row.has_photo ? `/uploads/avatars/${row.id}` : null,
     featured: plan === 'premium' || plan === 'elite', plan, videos: row.vcount || 0,
   };
-  if (full) Object.assign(out, { pos2: d.pos2 || null, foot: d.foot || null, h: d.h || null, w: d.w || null, club: d.club || null, bio: d.bio || null });
+  // Fiche complète : tout sauf l'e-mail et le téléphone.
+  if (full) Object.assign(out, { name: row.name, dob: row.dob || null, res: d.res || null, pos2: d.pos2 && d.pos2.length ? d.pos2 : null, foot: d.foot || null, h: d.h || null, w: d.w || null, club: d.club || null, bio: d.bio || null });
   return out;
 }
 
