@@ -2,7 +2,7 @@
 (function(){
 var $=function(s){return document.querySelector(s)},$$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
 var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,fine=matchMedia('(pointer:fine)').matches;
-var COL=[['#15357a','#7f4516','#ffffff','#b97c52'],['#0f8a63','#064a37','#ffc629','#8d5a3b'],['#65452a','#0f1c3a','#ffffff','#a86f49'],['#15357a','#75441c','#ffc629','#c68f64'],['#0f8a63','#07402f','#ffffff','#9a6040'],['#65452a','#14224a','#ffc629','#b97c52']];
+var COL=[['#15357a','#0b1b3f','#ffffff','#b97c52'],['#0f8a63','#064a37','#ffc629','#8d5a3b'],['#65452a','#0f1c3a','#ffffff','#a86f49'],['#15357a','#75441c','#ffc629','#c68f64'],['#0f8a63','#07402f','#ffffff','#9a6040'],['#65452a','#14224a','#ffc629','#b97c52']];
 var P=[
  ['Jordan Mbala',19,'Cameroun','Douala','Attaquant','ATT','Droit','1,78 m','Semi-professionnel','D2'],
  ['Kevin Njoya',21,'Cameroun','Yaoundé','Milieu','MIL','Gauche','1,76 m','Amateur','Senior'],
