@@ -72,7 +72,7 @@ function createApp() {
   if (fs.existsSync(path.join(config.publicDir, 'admin.html'))) {
     app.get('/admin', (req, res) => res.sendFile(path.join(config.publicDir, 'admin.html'), { headers: { 'X-Robots-Tag': 'noindex' } }));
   }
-  app.use(express.static(config.publicDir, { index: false, maxAge: config.isProd ? '1d' : 0, setHeaders: (res, p) => { if (/\.(html|webmanifest)$/.test(p)) res.set('Cache-Control', 'no-cache'); } }));
+  app.use(express.static(config.publicDir, { index: false, maxAge: config.isProd ? '1d' : 0, setHeaders: (res, p) => { if (/\.(html|webmanifest|css|js)$/.test(p)) res.set('Cache-Control', 'no-cache'); } }));
 
   app.use((req, res) => res.status(404).type('text').send('Page introuvable.'));
   // eslint-disable-next-line no-unused-vars
