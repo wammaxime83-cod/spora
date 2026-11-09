@@ -94,7 +94,8 @@ test('accès admin refusé aux non-admins, invité, export, suppression', async 
   const c = new Client();
   await c.req('POST', '/api/auth/login', { email: 'pro@test.cm', password: 'Sup3r-Secret!' });
   assert.equal((await c.req('GET', '/api/admin/stats')).status, 403);
-  assert.equal((await new Client().req('POST', '/api/guest', { country: 'Cameroun', who: 'Parent', interests: ['Joueurs'] })).status, 201);
+  assert.equal((await new Client().req('POST', '/api/guest', { country: 'Cameroun', who: 'Parent', interests: ['Joueurs'], email: 'invite@test.cm' })).status, 201);
+  assert.equal((await new Client().req('POST', '/api/guest', { country: 'Cameroun' })).status, 400);
   const ex = await c.req('GET', '/api/me/export'); assert.equal(ex.status, 200); assert.ok(!('pass_hash' in ex.body.account));
   assert.equal((await c.req('DELETE', '/api/auth/me', { password: 'faux' })).status, 403);
   assert.equal((await c.req('DELETE', '/api/auth/me', { password: 'Sup3r-Secret!' })).status, 200);

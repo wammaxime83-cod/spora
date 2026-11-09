@@ -184,7 +184,7 @@ agent:[F('photo','Photo','photo',{full:1}),F('org','Nom professionnel ou agence'
  F('pemail','E-mail professionnel','email'),F('ptel','Téléphone professionnel','tel'),F('priv','Visibilité de tes coordonnées','select',{o:['Visibles par les membres vérifiés','Visibles après mise en contact','Masquées'],full:1}),F('bio','Présentation','textarea',{ph:'Ton activité, les profils que tu recherches…',full:1})],
 club:[F('photo','Logo ou photo de la structure','photo',{full:1}),F('org','Nom de la structure','text',{req:1,full:1}),F('typ','Type','select',{req:1,o:['Club professionnel','Club amateur','Académie','Centre de formation']}),F('crea','Année de création','number',{ph:'2010'}),F('ctry','Pays','select',{req:1,o:CT}),F('city','Ville','text',{req:1}),
  F('champ','Championnat ou niveau','text',{ph:'Ex. Élite Two, régional…',full:1}),F('resp','Responsable (nom et fonction)','text',{req:1,ph:'Ex. A. Mbarga, directeur sportif',full:1}),F('pemail','E-mail professionnel','email',{req:1}),F('ptel','Téléphone','tel'),F('seek','Postes recherchés','chips',{o:POS,full:1}),F('web','Site ou réseau social','text',{full:1}),F('bio','Présentation','textarea',{ph:'Ta structure, ton projet sportif…',full:1})],
-invite:[F('ctry','Ton pays','select',{req:1,o:CT}),F('who','Tu es plutôt…','radio',{o:['Parent','Entraîneur','Supporter','Journaliste','Curieux'],full:1}),F('see','Ce que tu veux découvrir','chips',{o:['Joueurs','Agents','Clubs','Highlights','Opportunités'],full:1}),F('email','E-mail (pour être prévenu au lancement)','email',{full:1,ph:'facultatif'})]};
+invite:[F('ctry','Ton pays','select',{req:1,o:CT}),F('who','Tu es plutôt…','radio',{o:['Parent','Entraîneur','Supporter','Journaliste','Curieux'],full:1}),F('see','Ce que tu veux découvrir','chips',{o:['Joueurs','Agents','Clubs','Highlights','Opportunités'],full:1}),F('email','Ton e-mail (pour être prévenu au lancement)','email',{full:1,req:1,ph:'toi@exemple.com'})]};
 function steps(){return S.role==='invite'?['Profil','Infos','Terminé']:['Profil','Compte','Informations','Terminé']}
 function key(){var st=steps();var k=st[S.step];return k==='Profil'?'role':k==='Compte'?'acc':k==='Terminé'?'done':'info'}
 function esc(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -233,7 +233,7 @@ function next(){var k=key();S.msg='';
 function payload(){var v=S.v,r=S.role,p={};INFO[r].forEach(function(f){if(f.t==='photo')return;var x=v[f.id];if(Array.isArray(x))p[f.id]=x;else if(x!==undefined&&x!==''&&x!==null)p[f.id]=f.t==='number'?Number(x):x});
  return {role:r,name:v.name,email:v.email,tel:v.tel||undefined,password:v.pw,accept_terms:true,profile:p,photo:S.photo||undefined}}
 function submit(){S.busy=true;S.msg='';render();
- var call=S.role==='invite'?Spora.api('POST','/guest',{country:S.v.ctry,who:S.v.who||undefined,interests:S.v.see||[],email:S.v.email||undefined}):Spora.api('POST','/auth/register',payload());
+ var call=S.role==='invite'?Spora.api('POST','/guest',{country:S.v.ctry,who:S.v.who||undefined,interests:S.v.see||[],email:S.v.email}):Spora.api('POST','/auth/register',payload());
  call.then(function(j){S.busy=false;if(j&&j.user)Spora.set(j.user);S.step++;go()},function(e){S.busy=false;var f=e.field||'';S.msg=e.message;
   if(/^profile\./.test(f)){var id=f.slice(8).split('.')[0];S.err[id]=e.message;}
   else if(f==='email'||f==='password'||f==='name'||f==='tel'||f==='accept_terms'){var m={password:'pw',accept_terms:'cgu'}[f]||f;S.err[m]=e.message;S.step=S.role==='invite'?S.step:1}

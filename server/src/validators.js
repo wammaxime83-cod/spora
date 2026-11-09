@@ -77,7 +77,7 @@ const guest = z.object({
   country: z.enum(COUNTRIES),
   who: opt(z.enum(['Parent', 'Entraîneur', 'Supporter', 'Journaliste', 'Curieux'])),
   interests: z.array(z.enum(['Joueurs', 'Agents', 'Clubs', 'Highlights', 'Opportunités'])).max(5).optional().default([]),
-  email: opt(email),
+  email,
 }).strict();
 const contact = z.object({ to: z.number().int().positive(), message: txt(600, 10) }).strict();
 
