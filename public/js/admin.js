@@ -1,10 +1,13 @@
 (function(){
 var app=document.getElementById('app'),filter='en_attente',view='users';
 function esc(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function tabs(){return '<div class="bar"><button data-v="users" class="'+(view==='users'?'on':'')+'">Comptes</button><button data-v="chats" class="'+(view==='chats'?'on':'')+'">Conversations</button></div>'}
+function tabs(){return '<div class="bar"><button data-v="users" class="'+(view==='users'?'on':'')+'">Comptes</button><button data-v="chats" class="'+(view==='chats'?'on':'')+'">Conversations</button><button data-v="guests" class="'+(view==='guests'?'on':'')+'">Invités</button></div>'}
 function loadChats(){Spora.api('GET','/admin/conversations').then(function(j){var l=j.conversations||[];
  app.innerHTML=tabs()+'<p style="color:var(--t2)">Supervision en lecture seule. Chaque consultation est enregistrée.</p><div class="tw"><table><thead><tr><th>De</th><th>Vers</th><th>Statut</th><th>Messages</th><th>Dernier</th><th></th></tr></thead><tbody>'+(l.length?l.map(function(c){return '<tr><td>'+esc(c.from_name)+'<br><small>'+esc(c.from_role)+'</small></td><td>'+esc(c.to_name)+'<br><small>'+esc(c.to_role)+'</small></td><td><span class="tag '+(c.status==='accepte'?'verifie':c.status==='refuse'?'refuse':'')+'">'+esc(c.status)+'</span></td><td>'+c.n+'</td><td>'+esc(c.last_at||c.created_at)+'</td><td><button data-c="'+c.id+'">Lire</button><div id="c'+c.id+'"></div></td></tr>'}).join(''):'<tr><td colspan="6">Aucune conversation.</td></tr>')+'</tbody></table></div>'},function(e){app.innerHTML='<div class="msg">'+esc(e.message)+'</div>'})}
+function loadGuests(){Spora.api('GET','/admin/guests').then(function(j){var l=j.guests||[];
+ app.innerHTML=tabs()+'<p style="color:var(--t2)">'+l.length+' profil(s) invité(s) enregistré(s).</p><div class="tw"><table><thead><tr><th>Date</th><th>Pays</th><th>Profil</th><th>Centres d\'intérêt</th><th>E-mail</th></tr></thead><tbody>'+(l.length?l.map(function(g){var it=[];try{it=JSON.parse(g.interests||'[]')}catch(e){}return '<tr><td>'+esc(g.created_at)+'</td><td>'+esc(g.country)+'</td><td>'+esc(g.who||'—')+'</td><td>'+esc(it.join(', ')||'—')+'</td><td>'+esc(g.email||'—')+'</td></tr>'}).join(''):'<tr><td colspan="5">Aucun invité pour le moment.</td></tr>')+'</tbody></table></div>'},function(e){app.innerHTML='<div class="msg">'+esc(e.message)+'</div>'})}
 function load(){
+ if(view==='guests')return loadGuests();
  if(view==='chats')return loadChats();
  Promise.all([Spora.api('GET','/admin/stats'),Spora.api('GET','/admin/users'+(filter?'?status='+filter:''))]).then(function(r){draw(r[0],r[1].users)},function(e){app.innerHTML='<div class="msg">'+(e.status===401?'Connecte-toi d\'abord avec un compte administrateur sur <a href="/#connexion">le site</a>.':e.status===403?'Accès réservé aux administrateurs (variable ADMIN_EMAILS).':esc(e.message))+'</div>'})}
 function draw(s,u){
