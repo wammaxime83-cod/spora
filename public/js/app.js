@@ -19,16 +19,18 @@ function pcard(p,i){return '<article class="pcard" data-tilt><div class="pimg" '
 $$('[data-pl]').forEach(function(el){var i=+el.dataset.pl,p=P[i];el.innerHTML='<div class="pimg" '+art(i)+'><span class="num">'+(i*3%11+7)+'</span></div><div class="pb"><div><b>'+p[0].split(' ')[0]+' '+p[0].split(' ')[1][0]+'.</b><small>'+p[4]+' · '+p[1]+' ans</small></div><span class="vf">★</span></div>'});
 /* ring */
 var ring=$('#ring'),N=9;
-ring.innerHTML=P.slice(0,N).map(function(p,i){var w=document.createElement('div');w.style.cssText='';return '<div class="pcard-wrap" style="position:absolute;inset:0;transform:rotateY(calc('+i+'*var(--step))) translateZ(var(--r));backface-visibility:hidden">'+pcard(p,i).replace('data-tilt','')+'</div>'}).join('');
+function buildRing(){var real=!!(REAL&&REAL.length),list=real?REAL:P;N=real?Math.max(5,Math.min(REAL.length,9)):9;var h='';
+ for(var k=0;k<N;k++){var p=list[k%list.length];h+='<div class="pcard-wrap" style="position:absolute;inset:0;transform:rotateY(calc('+k+'*var(--step))) translateZ(var(--r));backface-visibility:hidden">'+(real?rcard(p,k):pcard(p,k)).replace('data-tilt','')+'</div>'}
+ ring.innerHTML=h;layout();var cn=$('#carNote');if(cn)cn.textContent='Glisse ou utilise les flèches · '+(real?'profils vérifiés':'profils fictifs')}
 var ang=0,vel=0,drag=false,lx=0,paused=false;
 function layout(){var w=ring.offsetWidth||240,step=360/N,r=Math.round((w/2+22)/Math.tan(Math.PI/N));ring.style.setProperty('--step',step+'deg');ring.style.setProperty('--r',r+'px');}
-layout();addEventListener('resize',layout);
+buildRing();addEventListener('resize',layout);
 var cw=$('#carwrap');
 cw.addEventListener('pointerdown',function(e){drag=true;lx=e.clientX;cw.setPointerCapture&&cw.setPointerCapture(e.pointerId)});
 cw.addEventListener('pointermove',function(e){if(!drag)return;var d=e.clientX-lx;lx=e.clientX;ang+=d*.35;vel=d*.35});
 ['pointerup','pointercancel'].forEach(function(n){cw.addEventListener(n,function(){drag=false})});
 cw.addEventListener('mouseenter',function(){paused=true});cw.addEventListener('mouseleave',function(){paused=false});
-$('#prev').addEventListener('click',function(){ang+=60});$('#next').addEventListener('click',function(){ang-=60});
+$('#prev').addEventListener('click',function(){ang+=360/N});$('#next').addEventListener('click',function(){ang-=360/N});
 var shown=ang;
 (function loop(){ if(!drag&&!paused&&!reduce)ang-=.12; vel*=.92; shown+=(ang-shown)*.12; ring.style.setProperty('--a',shown+'deg'); requestAnimationFrame(loop)})();
 /* vidéos */
@@ -56,7 +58,7 @@ function renderReal(){var q=$('#pq').value.toLowerCase().trim(),pos=$('#pPos').v
   if(ok&&age){var a=age.split('-');ok=p.age!=null&&p.age>=+a[0]&&p.age<=+a[1]}
   if(ok){n++;h+=rcard(p,i)}});
  $('#pGrid').innerHTML=h;$('#pCount').textContent=n+(n>1?' joueurs à découvrir':' joueur à découvrir');$('#pEmpty').style.display=n?'none':'block';bindTilt($('#pGrid'));}
-function loadReal(){Spora.api('GET','/players?limit=24').then(function(j){REAL=j.players&&j.players.length?j.players:null;var nt=document.querySelector('[data-page="joueurs"] .box>.note');if(nt)nt.textContent=REAL?'Profils vérifiés par l\'équipe Spora. Les coordonnées ne sont partagées qu\'avec l\'accord du joueur.':'Profils fictifs, à titre d\'illustration. Dès que des joueurs sont vérifiés, ils apparaissent ici à la place.';renderPlayers();heroReal()},function(){})}
+function loadReal(){Spora.api('GET','/players?limit=24').then(function(j){REAL=j.players&&j.players.length?j.players:null;var nt=document.querySelector('[data-page="joueurs"] .box>.note');if(nt)nt.textContent=REAL?'Profils vérifiés par l\'équipe Spora. Les coordonnées ne sont partagées qu\'avec l\'accord du joueur.':'Profils fictifs, à titre d\'illustration. Dès que des joueurs sont vérifiés, ils apparaissent ici à la place.';renderPlayers();heroReal();buildRing()},function(){})}
 var heroT=null,heroOff=0;
 function heroReal(){var cs=$$('#hcards .hc');if(!cs.length||!REAL||!REAL.length)return;clearInterval(heroT);
  function paint(){cs.forEach(function(el,k){if(REAL.length<=k){el.style.display='none';return}var idx=(heroOff+k)%REAL.length,p=REAL[idx];el.style.display='';el.classList.remove('sw');void el.offsetWidth;el.classList.add('sw');
