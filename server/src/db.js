@@ -66,6 +66,16 @@ const SCHEMA = [
   duration REAL,
   bytes INTEGER,
   created_at TEXT NOT NULL DEFAULT (datetime('now')))`,
+`CREATE TABLE IF NOT EXISTS video_likes (
+  video_id INTEGER NOT NULL, user_id INTEGER NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (video_id, user_id))`,
+`CREATE TABLE IF NOT EXISTS video_comments (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  video_id INTEGER NOT NULL, user_id INTEGER NOT NULL,
+  body TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')))`,
+`CREATE INDEX IF NOT EXISTS idx_vcom_video ON video_comments(video_id)`,
 `CREATE INDEX IF NOT EXISTS idx_profiles_pos ON profiles(pos)`,
 `CREATE INDEX IF NOT EXISTS idx_profiles_nat ON profiles(nat)`,
 `CREATE TABLE IF NOT EXISTS sessions (
@@ -108,7 +118,7 @@ async function purge() {
 
 // Supprime un compte et tout ce qui lui est lié (sans dépendre des clés étrangères).
 db.deleteUser = id => db.tx(async t => {
-  for (const sql of ['DELETE FROM videos WHERE user_id=?', 'DELETE FROM photos WHERE user_id=?', 'DELETE FROM sessions WHERE user_id=?', 'DELETE FROM email_tokens WHERE user_id=?',
+  for (const sql of ['DELETE FROM video_likes WHERE video_id IN (SELECT id FROM videos WHERE user_id=?)', 'DELETE FROM video_comments WHERE video_id IN (SELECT id FROM videos WHERE user_id=?)', 'DELETE FROM video_likes WHERE user_id=?', 'DELETE FROM video_comments WHERE user_id=?', 'DELETE FROM videos WHERE user_id=?', 'DELETE FROM photos WHERE user_id=?', 'DELETE FROM sessions WHERE user_id=?', 'DELETE FROM email_tokens WHERE user_id=?',
     'DELETE FROM contacts WHERE from_user=? OR to_user=?', 'DELETE FROM profiles WHERE user_id=?']) {
     await t.run(sql, sql.includes('OR') ? [id, id] : [id]);
   }

@@ -155,6 +155,22 @@ test('vidéos : envoi signé, vérification, limite, fil public, suppression', a
     assert.equal((await pl.req('GET', '/api/videos')).body.videos.length, 0);
     await admin.req('PUT', `/api/admin/users/${uid}/status`, { status: 'verifie' });
     const feed = await pl.req('GET', '/api/videos'); assert.equal(feed.body.videos[0].player.name, 'Vid E.');
+    // j'aime, commentaires
+    const vid = feed.body.videos[0].id;
+    assert.equal((await new Client().req('POST', `/api/videos/${vid}/like`)).status, 401);
+    let lk = await other.req('POST', `/api/videos/${vid}/like`); assert.equal(lk.body.liked, true); assert.equal(lk.body.likes, 1);
+    assert.equal((await other.req('GET', '/api/videos')).body.videos[0].liked, true);
+    lk = await other.req('POST', `/api/videos/${vid}/like`); assert.equal(lk.body.likes, 0);
+    assert.equal((await new Client().req('POST', `/api/videos/${vid}/comments`, { body: 'Bravo' })).status, 401);
+    assert.equal((await other.req('POST', `/api/videos/${vid}/comments`, { body: '   ' })).status, 400);
+    assert.equal((await other.req('POST', `/api/videos/${vid}/comments`, { body: 'x'.repeat(501) })).status, 400);
+    assert.equal((await other.req('POST', `/api/videos/${vid}/comments`, { body: 'Magnifique action !' })).status, 201);
+    const cms = await new Client().req('GET', `/api/videos/${vid}/comments`);
+    assert.equal(cms.body.comments.length, 1); assert.equal(cms.body.comments[0].name, 'Autre J.'); assert.equal(cms.body.comments[0].mine, false);
+    assert.equal((await pl.req('GET', '/api/videos')).body.videos[0].comments, 1);
+    assert.equal((await new Client().req('DELETE', `/api/videos/comments/${cms.body.comments[0].id}`)).status, 401);
+    assert.equal((await pl.req('DELETE', `/api/videos/comments/${cms.body.comments[0].id}`)).status, 403);
+    assert.equal((await other.req('DELETE', `/api/videos/comments/${cms.body.comments[0].id}`)).status, 200);
     // un agent ne peut pas publier
     assert.equal((await new Client().req('POST', '/api/me/videos/sign', {})).status, 401);
     // durée trop longue refusée

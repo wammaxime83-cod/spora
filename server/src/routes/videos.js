@@ -64,6 +64,8 @@ me.post('/videos', limiter, async (req, res) => {
 me.delete('/videos/:id', async (req, res) => {
   const v = await db.get('SELECT * FROM videos WHERE id=? AND user_id=?', [Number(req.params.id), req.user.id]);
   if (!v) throw new HttpError(404, 'Vidéo introuvable.');
+  await db.run('DELETE FROM video_likes WHERE video_id=?', [v.id]);
+  await db.run('DELETE FROM video_comments WHERE video_id=?', [v.id]);
   await db.run('DELETE FROM videos WHERE id=?', [v.id]);
   await cl.destroy(v.public_id);
   res.json({ ok: true });
@@ -71,10 +73,56 @@ me.delete('/videos/:id', async (req, res) => {
 
 // ---- Fil public (Highlights) : vidéos des joueurs vérifiés ----
 const feed = express.Router();
+const interLimiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 60, standardHeaders: true, legacyHeaders: false, message: { error: 'Trop d\'actions. Réessaie dans quelques minutes.' } });
+const publicVideo = id => db.get("SELECT v.id FROM videos v JOIN users u ON u.id=v.user_id WHERE v.id=? AND u.status='verifie'", [id]);
+
 feed.get('/', async (req, res) => {
-  const rows = await db.all(`SELECT v.*, u.name, u.role, u.id AS uid, p.pos, p.nat FROM videos v JOIN users u ON u.id=v.user_id JOIN profiles p ON p.user_id=u.id
-    WHERE u.status='verifie' ORDER BY v.id DESC LIMIT 30`);
-  res.json({ videos: rows.map(r => ({ ...item(r), player: { id: r.uid, role: r.role, name: shortName(r.name), pos: r.pos, nat: r.nat } })) });
+  const uid = req.user ? req.user.id : 0;
+  const rows = await db.all(`SELECT v.*, u.name, u.role, u.id AS uid, p.pos, p.nat,
+      (SELECT COUNT(*) FROM video_likes l WHERE l.video_id=v.id) AS likes,
+      (SELECT COUNT(*) FROM video_comments c WHERE c.video_id=v.id) AS comments,
+      (SELECT COUNT(*) FROM video_likes l WHERE l.video_id=v.id AND l.user_id=?) AS liked
+    FROM videos v JOIN users u ON u.id=v.user_id JOIN profiles p ON p.user_id=u.id
+    WHERE u.status='verifie' ORDER BY v.id DESC LIMIT 100`, [uid]);
+  res.set('Cache-Control', 'no-store');
+  res.json({ videos: rows.map(r => ({ ...item(r), likes: r.likes, comments: r.comments, liked: !!r.liked, player: { id: r.uid, role: r.role, name: shortName(r.name), pos: r.pos, nat: r.nat } })) });
+});
+
+feed.post('/:id/like', requireAuth, interLimiter, async (req, res) => {
+  const id = Number(req.params.id);
+  if (!(await publicVideo(id))) throw new HttpError(404, 'Vidéo introuvable.');
+  const had = await db.get('SELECT 1 FROM video_likes WHERE video_id=? AND user_id=?', [id, req.user.id]);
+  if (had) await db.run('DELETE FROM video_likes WHERE video_id=? AND user_id=?', [id, req.user.id]);
+  else await db.run('INSERT INTO video_likes (video_id, user_id) VALUES (?,?)', [id, req.user.id]);
+  const n = (await db.get('SELECT COUNT(*) n FROM video_likes WHERE video_id=?', [id])).n;
+  res.json({ liked: !had, likes: n });
+});
+
+feed.get('/:id/comments', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!(await publicVideo(id))) return res.json({ comments: [] });
+  const rows = await db.all(`SELECT c.id, c.body, c.created_at, c.user_id, u.name FROM video_comments c JOIN users u ON u.id=c.user_id WHERE c.video_id=? ORDER BY c.id DESC LIMIT 50`, [id]);
+  const uid = req.user ? req.user.id : 0, adm = !!(req.user && req.user.is_admin);
+  res.set('Cache-Control', 'no-store');
+  res.json({ comments: rows.map(r => ({ id: r.id, body: r.body, created_at: r.created_at, name: shortName(r.name), mine: r.user_id === uid || adm })) });
+});
+
+feed.post('/:id/comments', requireAuth, interLimiter, async (req, res) => {
+  const id = Number(req.params.id);
+  if (!(await publicVideo(id))) throw new HttpError(404, 'Vidéo introuvable.');
+  const body = String((req.body || {}).body || '').replace(/\s+/g, ' ').trim();
+  if (!body) throw new HttpError(400, 'Écris un commentaire.');
+  if (body.length > 500) throw new HttpError(400, 'Commentaire trop long (500 caractères maximum).');
+  const r = await db.run('INSERT INTO video_comments (video_id, user_id, body) VALUES (?,?,?)', [id, req.user.id, body]);
+  res.status(201).json({ ok: true, id: Number(r.lastInsertRowid) });
+});
+
+feed.delete('/comments/:cid', requireAuth, async (req, res) => {
+  const c = await db.get('SELECT * FROM video_comments WHERE id=?', [Number(req.params.cid)]);
+  if (!c) throw new HttpError(404, 'Commentaire introuvable.');
+  if (c.user_id !== req.user.id && !req.user.is_admin) throw new HttpError(403, 'Action non autorisée.');
+  await db.run('DELETE FROM video_comments WHERE id=?', [c.id]);
+  res.json({ ok: true });
 });
 
 // Supprime les vidéos d'un compte chez Cloudinary (avant suppression du compte).
