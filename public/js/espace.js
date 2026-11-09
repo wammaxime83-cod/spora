@@ -11,6 +11,8 @@ var P={},state={contacts:null},quiet=false;
 Spora.on(function(u){
  var l=$('header .login'),c=$('header .btn.sm');
  if(l){l.textContent=u?'Mon espace':'Connexion';l.setAttribute('href',u?'#espace':'#connexion')}
+ var ad=document.getElementById('spAdm');
+ if(u&&u.is_admin&&l){if(!ad){ad=document.createElement('a');ad.id='spAdm';ad.className='login';ad.href='/admin';ad.textContent='Administration';ad.style.fontWeight='800';l.parentNode.insertBefore(ad,l)}}else if(ad)ad.remove();
  if(c){c.textContent=u?'Se déconnecter':'Créer un compte';if(u){c.setAttribute('href','#accueil');c.dataset.out='1'}else{c.setAttribute('href','#inscription');delete c.dataset.out}}
  if(window.__refreshPlayers)window.__refreshPlayers();
  if(window.__refreshAgents)window.__refreshAgents();
