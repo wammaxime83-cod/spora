@@ -2,7 +2,7 @@
 (function(){
 var $=function(s){return document.querySelector(s)},$$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
 var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,fine=matchMedia('(pointer:fine)').matches;
-var COL=[['#eb8633','#7f4516','#ffffff','#b97c52'],['#0f8a63','#064a37','#ffc629','#8d5a3b'],['#65452a','#0f1c3a','#ffffff','#a86f49'],['#eb8633','#75441c','#ffc629','#c68f64'],['#0f8a63','#07402f','#ffffff','#9a6040'],['#65452a','#14224a','#ffc629','#b97c52']];
+var COL=[['#15357a','#7f4516','#ffffff','#b97c52'],['#0f8a63','#064a37','#ffc629','#8d5a3b'],['#65452a','#0f1c3a','#ffffff','#a86f49'],['#15357a','#75441c','#ffc629','#c68f64'],['#0f8a63','#07402f','#ffffff','#9a6040'],['#65452a','#14224a','#ffc629','#b97c52']];
 var P=[
  ['Jordan Mbala',19,'Cameroun','Douala','Attaquant','ATT','Droit','1,78 m','Semi-professionnel','D2'],
  ['Kevin Njoya',21,'Cameroun','Yaoundé','Milieu','MIL','Gauche','1,76 m','Amateur','Senior'],
@@ -111,8 +111,8 @@ follow($('#scene'),$('#world'));follow($('#fan'),$('#fanin'));
  cvs.forEach(size);addEventListener('resize',function(){cvs.forEach(size)});
  function draw(o){var x=o.x,w=o.w,h=o.h;x.clearRect(0,0,w,h);
   o.pts.forEach(function(p){if(!reduce){p.x+=p.vx;p.y+=p.vy}if(p.x<0)p.x=w;if(p.x>w)p.x=0;if(p.y<0)p.y=h;if(p.y>h)p.y=0});
-  if(o.m==='n'){x.lineWidth=1;for(var i=0;i<o.pts.length;i++)for(var j=i+1;j<o.pts.length;j++){var a=o.pts[i],b=o.pts[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);if(d<150){x.strokeStyle=(DK()?'rgba(243,195,132,':'rgba(235,134,51,')+(.4*(1-d/150))+')';x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()}}}
-  o.pts.forEach(function(p){x.beginPath();x.fillStyle=p.g?(DK()?'rgba(255,198,41,.95)':'rgba(240,170,0,.95)'):(DK()?(o.m==='n'?'rgba(247,217,178,.9)':'rgba(246,209,159,.65)'):'rgba(235,134,51,.55)');x.arc(p.x,p.y,p.g&&o.m==='n'?p.r+1.5:p.r,0,6.283);x.fill()})}
+  if(o.m==='n'){x.lineWidth=1;for(var i=0;i<o.pts.length;i++)for(var j=i+1;j<o.pts.length;j++){var a=o.pts[i],b=o.pts[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);if(d<150){x.strokeStyle=(DK()?'rgba(243,195,132,':'rgba(21,53,122,')+(.4*(1-d/150))+')';x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()}}}
+  o.pts.forEach(function(p){x.beginPath();x.fillStyle=p.g?(DK()?'rgba(255,198,41,.95)':'rgba(240,170,0,.95)'):(DK()?(o.m==='n'?'rgba(247,217,178,.9)':'rgba(180,200,245,.65)'):'rgba(21,53,122,.55)');x.arc(p.x,p.y,p.g&&o.m==='n'?p.r+1.5:p.r,0,6.283);x.fill()})}
  (function loop(){if(!document.hidden&&scrollY<innerHeight)cvs.forEach(function(o){if(o.c.parentNode.classList.contains('on'))draw(o)});requestAnimationFrame(loop)})();
  /* parallaxe des cartes */
  var hc=$('#hcards');if(hc&&!reduce&&fine)hero.addEventListener('pointermove',function(e){var r=hero.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;hc.style.setProperty('--px',(x*40)+'px');hc.style.setProperty('--py',(y*30)+'px')});
