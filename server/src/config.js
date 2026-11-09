@@ -22,6 +22,7 @@ const config = {
   // Derrière un proxy (Render, Railway, Nginx...), mettre TRUST_PROXY=1
   trustProxy: env.TRUST_PROXY || (isProd ? '1' : ''),
   cookieSecure: env.COOKIE_SECURE ? env.COOKIE_SECURE === 'true' : isProd,
+  registerLimit: num(env.REGISTER_LIMIT_PER_HOUR, 10),
   bcryptRounds: num(env.BCRYPT_ROUNDS, 12),
   adminEmails: (env.ADMIN_EMAILS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean),
   smtpUrl: env.SMTP_URL || '',
@@ -29,6 +30,22 @@ const config = {
   maxPhotoBytes: num(env.MAX_PHOTO_BYTES, 600 * 1024),
 };
 config.dbFile = path.join(config.dataDir, 'spora.db');
-config.uploadDir = path.join(config.dataDir, 'uploads');
-fs.mkdirSync(config.uploadDir, { recursive: true });
+// Production : base Turso (TURSO_DATABASE_URL, TURSO_AUTH_TOKEN). Sinon : fichier local.
+config.dbUrl = env.TURSO_DATABASE_URL || 'file:' + config.dbFile;
+config.dbToken = env.TURSO_AUTH_TOKEN || '';
+if (config.dbUrl.startsWith('file:')) fs.mkdirSync(config.dataDir, { recursive: true });
+
+// Vidéos : stockées chez Cloudinary (offre gratuite). CLOUDINARY_URL=cloudinary://clé:secret@nom_du_cloud
+(function () {
+  let cloud = env.CLOUDINARY_CLOUD_NAME, key = env.CLOUDINARY_API_KEY, secret = env.CLOUDINARY_API_SECRET;
+  const m = /^cloudinary:\/\/([^:]+):([^@]+)@(.+)$/.exec(env.CLOUDINARY_URL || '');
+  if (m) { key = m[1]; secret = m[2]; cloud = m[3]; }
+  config.cloudinary = cloud && key && secret ? { cloud, key, secret } : null;
+  config.maxVideos = num(env.MAX_VIDEOS, 3);
+  // Sans Cloudinary : envoi direct sur le serveur (mode TEST : sur un hébergement gratuit, les fichiers peuvent être effacés).
+  config.localVideos = env.LOCAL_VIDEOS !== 'off';
+  config.maxLocalVideoBytes = num(env.MAX_LOCAL_VIDEO_MB, 30) * 1024 * 1024;
+  config.videoDir = path.join(config.dataDir, 'videos');
+  config.maxVideoSeconds = num(env.MAX_VIDEO_SECONDS, 180);
+})();
 module.exports = config;
