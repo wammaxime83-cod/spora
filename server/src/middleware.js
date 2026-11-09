@@ -21,6 +21,11 @@ async function loadUser(req, res, next) {
   if (tok && tok.length < 200) {
     const row = await db.prepare(`SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id
       WHERE s.token_hash = ? AND s.expires_at > datetime('now')`).get(sha256(tok));
+    if (row && !row.is_admin && config.adminEmails.includes(String(row.email).toLowerCase())) {
+      // Compte créé avant que ADMIN_EMAILS soit renseigné : on le promeut automatiquement.
+      await db.prepare("UPDATE users SET is_admin = 1, status = 'verifie' WHERE id = ?").run(row.id);
+      row.is_admin = 1; row.status = 'verifie';
+    }
     if (row) { req.user = row; req.sessionHash = sha256(tok); }
   }
   next();
