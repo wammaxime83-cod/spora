@@ -147,12 +147,11 @@ function loadFeed(){Spora.api('GET','/videos').then(function(j){
 
  g.className='hvl';
  function card(v){var p=v.player||{};var ini=(p.name||'?').charAt(0).toUpperCase();
-  return '<article class="hv" data-id="'+v.id+'"><header><span class="av">'+esc(ini)+'</span><div><b>'+esc(p.name||'')+'</b><small>'+esc([RL[p.role],p.pos,p.nat].filter(Boolean).join(' · '))+'</small></div></header>'
+  return '<article class="hv" data-id="'+v.id+'"><div class="who"><span class="av">'+esc(ini)+'</span><div><b>'+esc(p.name||'')+'</b><small>'+esc([RL[p.role],p.pos,p.nat].filter(Boolean).join(' · '))+'</small>'+(v.title?'<p>'+esc(v.title)+'</p>':'')+'</div></div>'
   +'<div class="vw"><video playsinline loop muted preload="metadata" '+(v.poster?'poster="'+esc(v.poster)+'" ':'')+'src="'+esc(v.src)+'"></video><button type="button" class="snd" aria-label="Activer le son">🔇</button></div>'
-  +(v.title?'<p class="tl">'+esc(v.title)+'</p>':'')
-  +'<div class="act"><button type="button" data-a="like" class="'+(v.liked?'on':'')+'" aria-pressed="'+(v.liked?'true':'false')+'"><i>'+(v.liked?'♥':'♡')+'</i> <span>'+(v.likes||0)+'</span></button>'
-  +'<button type="button" data-a="cm"><i>💬</i> <span>'+(v.comments||0)+'</span></button>'
-  +'<button type="button" data-a="sh"><i>↗</i> <em>Partager</em></button></div>'
+  +'<div class="act"><button type="button" data-a="like" class="'+(v.liked?'on':'')+'" aria-pressed="'+(v.liked?'true':'false')+'"><i>'+(v.liked?'♥':'♡')+'</i><span>'+(v.likes||0)+'</span></button>'
+  +'<button type="button" data-a="cm"><i>💬</i><span>'+(v.comments||0)+'</span></button>'
+  +'<button type="button" data-a="sh"><i>↗</i><em>Partager</em></button><button type="button" data-a="zap" aria-label="Plein écran"><i>⛶</i><em>Plein écran</em></button></div>'
   +'<div class="cmw" hidden><div class="cml"></div><form class="cmf"><input type="text" maxlength="500" placeholder="Ajouter un commentaire…" aria-label="Commentaire"><button type="submit">Publier</button></form><p class="cme" hidden></p></div></article>'}
  function ago(t){var d=new Date(String(t).replace(' ','T')+'Z'),s=(Date.now()-d)/1000;if(isNaN(s))return '';if(s<60)return "à l'instant";if(s<3600)return Math.floor(s/60)+' min';if(s<86400)return Math.floor(s/3600)+' h';return Math.floor(s/86400)+' j'}
  function needLogin(){closeZap();location.hash='#connexion'}
@@ -166,14 +165,15 @@ function loadFeed(){Spora.api('GET','/videos').then(function(j){
   var bt=e.target.closest('[data-a]');
   if(bt){var a=bt.dataset.a;
    if(a==='like'){if(!Spora.user)return needLogin();Spora.api('POST','/videos/'+card.dataset.id+'/like').then(function(r){cards(card.dataset.id).forEach(function(c){var b=c.querySelector('[data-a=like]');b.classList.toggle('on',r.liked);b.setAttribute('aria-pressed',r.liked?'true':'false');b.querySelector('i').textContent=r.liked?'♥':'♡';b.querySelector('span').textContent=r.likes})},function(){})}
+   if(a==='zap'){openZap(card.dataset.id);return}
    if(a==='cm'){var w=card.querySelector('.cmw');w.hidden=!w.hidden;if(!w.hidden){loadCm(card);if(Spora.user)w.querySelector('input').focus()}}
-   if(a==='sh'){var url=location.origin+'/#highlights',tx=(card.querySelector('header b').textContent||'Un joueur')+' sur Spora';var em=bt.querySelector('em');
+   if(a==='sh'){var url=location.origin+'/#highlights',tx=(card.querySelector('.who b').textContent||'Un joueur')+' sur Spora';var em=bt.querySelector('em');
     if(navigator.share){navigator.share({title:'Spora',text:tx,url:url}).catch(function(){})}
     else if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(function(){em.textContent='Lien copié !';setTimeout(function(){em.textContent='Partager'},1800)},function(){window.prompt('Copie ce lien :',url)})}
     else window.prompt('Copie ce lien :',url)}
    return}
   if(e.target.closest('.cmw'))return;
-  if(e.target.closest('.vw')){if(inZap){if(vd.paused)vd.play().catch(function(){});else vd.pause()}else openZap(card.dataset.id)}}
+  if(e.target.closest('.vw')){if(vd.paused)vd.play().catch(function(){});else vd.pause()}}
  function onSubmit(e){e.preventDefault();var card=e.target.closest('article.hv'),inp=card.querySelector('.cmf input'),er=card.querySelector('.cme');
   if(!Spora.user)return needLogin();var t=inp.value.trim();if(!t)return;er.hidden=true;
   Spora.api('POST','/videos/'+card.dataset.id+'/comments',{body:t}).then(function(){inp.value='';loadCm(card)},function(x){er.textContent=x.message;er.hidden=false})}
@@ -188,8 +188,8 @@ function loadFeed(){Spora.api('GET','/videos').then(function(j){
  function render(){var list=current();cnt.textContent=list.length+(list.length>1?' vidéos':' vidéo')+(q.value.trim()?' pour « '+q.value.trim()+' »':'');
   g.innerHTML=list.length?list.map(card).join(''):'<p class="none" style="text-align:center">Aucun talent ne correspond à cette recherche.</p>';
   if(window.__tt)window.__tt.disconnect();
-  var io=new IntersectionObserver(function(es){es.forEach(function(en){var vd=en.target.querySelector('video');if(en.isIntersecting&&en.intersectionRatio>=.6){var pr=vd.play();if(pr&&pr.catch)pr.catch(function(){})}else vd.pause()})},{threshold:[.6]});
-  g.querySelectorAll('.vw').forEach(function(a){io.observe(a)});window.__tt=io}
+  var io=new IntersectionObserver(function(es){es.forEach(function(en){var vd=en.target.querySelector('video');if(en.isIntersecting&&en.intersectionRatio>=.6){var pr=vd.play();if(pr&&pr.catch)pr.catch(function(){})}else vd.pause()})},{root:g,threshold:[.6]});
+  g.querySelectorAll('.hv').forEach(function(a){io.observe(a)});window.__tt=io}
  q.oninput=render;render();
 
  /* mode « zapper » : plein écran, une vidéo après l'autre */

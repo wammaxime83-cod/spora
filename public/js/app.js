@@ -56,7 +56,12 @@ function renderReal(){var q=$('#pq').value.toLowerCase().trim(),pos=$('#pPos').v
   if(ok&&age){var a=age.split('-');ok=p.age!=null&&p.age>=+a[0]&&p.age<=+a[1]}
   if(ok){n++;h+=rcard(p,i)}});
  $('#pGrid').innerHTML=h;$('#pCount').textContent=n+(n>1?' joueurs à découvrir':' joueur à découvrir');$('#pEmpty').style.display=n?'none':'block';bindTilt($('#pGrid'));}
-function loadReal(){Spora.api('GET','/players?limit=24').then(function(j){REAL=j.players&&j.players.length?j.players:null;var nt=document.querySelector('[data-page="joueurs"] .box>.note');if(nt)nt.textContent=REAL?'Profils vérifiés par l\'équipe Spora. Les coordonnées ne sont partagées qu\'avec l\'accord du joueur.':'Profils fictifs, à titre d\'illustration. Dès que des joueurs sont vérifiés, ils apparaissent ici à la place.';renderPlayers()},function(){})}
+function loadReal(){Spora.api('GET','/players?limit=24').then(function(j){REAL=j.players&&j.players.length?j.players:null;var nt=document.querySelector('[data-page="joueurs"] .box>.note');if(nt)nt.textContent=REAL?'Profils vérifiés par l\'équipe Spora. Les coordonnées ne sont partagées qu\'avec l\'accord du joueur.':'Profils fictifs, à titre d\'illustration. Dès que des joueurs sont vérifiés, ils apparaissent ici à la place.';renderPlayers();heroReal()},function(){})}
+var heroT=null,heroOff=0;
+function heroReal(){var cs=$$('#hcards .hc');if(!cs.length||!REAL||!REAL.length)return;clearInterval(heroT);
+ function paint(){cs.forEach(function(el,k){if(REAL.length<=k){el.style.display='none';return}var idx=(heroOff+k)%REAL.length,p=REAL[idx];el.style.display='';el.classList.remove('sw');void el.offsetWidth;el.classList.add('sw');
+  el.innerHTML='<div class="pimg" '+art(idx)+'>'+(p.photo?'<img alt="" src="'+p.photo+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit">':'<span class="num">'+(p.id*3%11+7)+'</span>')+'</div><div class="pb"><div><b>'+esc(p.name)+'</b><small>'+esc([p.pos,p.age!=null?p.age+' ans':''].filter(Boolean).join(' · '))+'</small></div><span class="vf">✓</span></div>'})}
+ paint();if(REAL.length>3&&!reduce)heroT=setInterval(function(){heroOff=(heroOff+1)%REAL.length;paint()},4500)}
 window.__refreshPlayers=loadReal;
 function renderPlayers(){if(REAL)return renderReal();var q=$('#pq').value.toLowerCase().trim(),pos=$('#pPos').value,age=$('#pAge').value,pays=$('#pPays').value,lvl=$('#pLvl').value,n=0,h='';
  P.forEach(function(p,i){var ok=(!q||(p[0]+' '+p[3]+' '+p[2]+' '+p[9]).toLowerCase().indexOf(q)>=0)&&(!pos||p[4]===pos)&&(!pays||p[2]===pays)&&(!lvl||p[8]===lvl);
