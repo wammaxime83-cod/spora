@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Spora, le réseau des talents du football africain</title>
+<meta name="description" content="Spora connecte les footballeurs africains aux agents, aux clubs et aux opportunités. Une meilleure visibilité à ton talent.">
+<meta name="theme-color" content="#1a2748">
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Spora">
+<meta property="og:title" content="Spora, le réseau des talents du football africain">
+<meta property="og:description" content="Une meilleure visibilité à ton talent. Joueurs, agents et clubs réunis au même endroit.">
+<meta property="og:image" content="{{SITE_URL}}/assets/og-image.png">
+<meta property="og:url" content="{{SITE_URL}}/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="{{SITE_URL}}/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<noscript><p style="padding:24px;font-family:sans-serif">Spora a besoin de JavaScript pour fonctionner. Active-le dans ton navigateur.</p></noscript>
+<header>
+  <a class="brand" href="#accueil" aria-label="Spora, accueil"><img class="mk" src="assets/logo-icon.svg" alt="" width="40" height="40"><span class="wm" role="img" aria-label="Spora"></span></a>
+  <nav class="main" aria-label="Navigation principale">
+    <a href="#accueil">Accueil</a><a href="#joueurs">Joueurs</a><a href="#agents">Agents</a><a href="#clubs">Clubs</a><a href="#highlights">Highlights</a><a href="#opportunites">Opportunités</a>
+  </nav>
+  <div class="hr">
+    <button class="theme" id="theme" type="button" aria-label="Changer de thème (jour / nuit)" title="Jour / nuit">
+      <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4"/></svg>
+    </button>
+    <a class="login" href="#connexion">Connexion</a>
+    <a class="btn sm hide-s" href="#inscription">Créer un compte</a>
+    <button class="burger" id="burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false"><span></span></button>
+  </div>
+</header>
+<div id="menu" aria-label="Menu">
+  <a href="#accueil">Accueil</a><a href="#joueurs">Joueurs</a><a href="#agents">Agents</a><a href="#clubs">Clubs</a><a href="#highlights">Highlights</a><a href="#opportunites">Opportunités</a><a href="#confiance">Confiance</a><a href="#premium">Offres</a>
+</div>
+
+<main>
+<!-- ================= ACCUEIL ================= -->
+<div class="page" data-page="accueil">
+  <section class="hero" id="hero">
+    <div class="bgs on" data-s="0"><div class="beams"></div><img class="ball" alt="" src="assets/logo-icon.svg"><canvas class="fx" data-m="p"></canvas></div>
+    <div class="bgs" data-s="1"><div class="pitch"><i></i></div><div class="beams b2"></div><canvas class="fx" data-m="p"></canvas></div>
+    <div class="bgs" data-s="2"><canvas class="fx" data-m="n"></canvas></div>
+    <div class="shade"></div>
+    <div class="box hero-in">
+      <div class="hcopy">
+        <span class="badge hin"><i></i>La plateforme des talents du football africain</span>
+        <h1 class="hin" style="--d:.08s">Le prochain talent <span class="grad">est peut-être ici.</span></h1>
+        <p class="desc hin" style="--d:.16s">Spora est l'application qui permet aux footballeurs africains de créer leur profil, publier leurs highlights et être découverts par des agents, des clubs et des recruteurs.</p>
+        <div class="row hin" style="--d:.24s">
+          <a class="btn wb" href="#joueurs">Explorer les talents <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+          <a class="btn gl" href="#inscription">Créer mon profil <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+        </div>
+        <p class="hnote hin" style="--d:.32s"><i></i>Lancement au Cameroun, puis dans toute l'Afrique</p>
+      </div>
+      <div class="hcards" id="hcards" aria-hidden="true">
+        <div class="hc h1c" data-pl="0" style="--k:1.2"></div>
+        <div class="hc h2c" data-pl="2" style="--k:-1"></div>
+        <div class="hc h3c" data-pl="1" style="--k:.7"></div>
+      </div>
+    </div>
+    <div class="sctl"><span class="dots" id="dots"><i class="on"></i><i></i><i></i></span><button type="button" id="sprev" aria-label="Fond précédent">‹</button><button type="button" id="snext" aria-label="Fond suivant">›</button></div>
+  </section>
+
+  <section class="sec os"><div class="orbs" aria-hidden="true"><i></i><i></i><i></i></div><div class="box">
+    <div class="sh rv"><div><small>Le constat</small><h2>Des talents partout. Trop peu de moyens d'être vus.</h2></div></div>
+    <div class="duo">
+      <div class="panel rv"><span class="badge">Côté joueurs</span><h3>Le talent existe, la visibilité manque.</h3><p>Académies, clubs amateurs ou professionnels : beaucoup de jeunes footballeurs ont les qualités, mais pas l'accès aux réseaux qui leur permettraient de se montrer à un agent, un recruteur ou un club.</p></div>
+      <div class="panel b rv" style="--d:.08s"><span class="badge">Côté professionnels</span><h3>Les profils fiables sont difficiles à trouver.</h3><p>Agents et clubs cherchent sans cesse de nouveaux joueurs, selon le poste, l'âge, la nationalité ou le niveau. Mais accéder à des profils bien présentés et faciles à consulter reste compliqué.</p></div>
+    </div>
+    <p class="verdict rv grad">Spora répond aux deux côtés : un même endroit où les talents se présentent et où les professionnels les trouvent.</p>
+  </div></section>
+
+  <section class="sec" id="comment"><div class="box">
+    <div class="sh rv"><div><small>Comment ça marche</small><h2>Trois étapes, un seul réseau.</h2></div></div>
+    <div class="steps">
+      <div class="step rv" data-tilt><span class="n">1</span><h3>Le joueur crée son profil</h3><p>Identité, poste, pied fort, taille, club ou académie, parcours, et ses meilleures actions en vidéo.</p></div>
+      <div class="step rv" data-tilt style="--d:.08s"><span class="n">2</span><h3>Les pros recherchent</h3><p>Agents, clubs et recruteurs filtrent par poste, âge, pays, niveau ou championnat.</p></div>
+      <div class="step rv" data-tilt style="--d:.16s"><span class="n">3</span><h3>Ils entrent en contact</h3><p>Messagerie intégrée et accès aux opportunités : détections, essais, recrutements.</p></div>
+    </div>
+  </div></section>
+
+  <section class="sec"><div class="box">
+    <div class="sh rv"><div><small>Talents à la une</small><h2>Découvrez les joueurs qui font parler d'eux.</h2></div><a class="more" href="#joueurs">Voir tous les joueurs →</a></div>
+    <div class="carwrap" id="carwrap"><div class="ring" id="ring"></div></div>
+    <div class="carctl"><button type="button" id="prev" aria-label="Précédent">‹</button><span>Glisse ou utilise les flèches · profils fictifs</span><button type="button" id="next" aria-label="Suivant">›</button></div>
+  </div></section>
+
+  <section class="sec"><div class="box appsec">
+    <div>
+      <div class="sh rv" style="margin-bottom:0"><div><small>L'application</small><h2>Tout Spora, dans ta poche.</h2></div></div>
+      <div class="feat rv" style="--d:.08s">
+        <div><i>1</i><p><b>Profil joueur</b><span>La vitrine du joueur : infos sportives et highlights.</span></p></div>
+        <div><i>2</i><p><b>Recherche</b><span>Pour les agents, clubs et recruteurs : filtres par poste, âge, pays.</span></p></div>
+        <div><i>3</i><p><b>Opportunités</b><span>Détections, essais, recrutements, avec messagerie intégrée.</span></p></div>
+      </div>
+      <div class="stores rv" style="--d:.14s">
+        <a class="store" href="#accueil" data-scroll="#contact" aria-label="App Store"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.5 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9s-1.9-.9-3.2-.8c-1.6 0-3.1.9-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3.1 2.5 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.7-1-2.7-4.1zM14 5.4c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z"/></svg><div><small>Télécharger sur</small><span>App Store</span></div></a>
+        <a class="store" href="#accueil" data-scroll="#contact" aria-label="Google Play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 2.7v18.6c0 .5.6.8 1 .5l15.2-9.3c.4-.2.4-.8 0-1L5 2.2c-.4-.3-1 0-1 .5z"/></svg><div><small>Disponible sur</small><span>Google Play</span></div></a>
+      </div>
+    </div>
+    <div class="fan" id="fan"><div class="fanin" id="fanin">
+      <div class="f0"><div class="phone " aria-hidden="true"><div class="notch"></div><div class="scr"><div class="sbar"></div><div class="ah"><span>RECHERCHE</span><i></i></div><div class="srch">Attaquant · 18–22 ans</div><div class="tg"><b class="g2">Cameroun</b><b>Pied droit</b><b>D2</b></div><div class="sech" style="padding-top:11px">12 profils</div><div class="pr-row"><div class="av"></div><div><b>Jordan M.</b><small>19 ans · Douala</small></div><em>ATT</em></div><div class="pr-row"><div class="av"></div><div><b>Samuel K.</b><small>21 ans · Yaoundé</small></div><em>ATT</em></div><div class="pr-row"><div class="av"></div><div><b>Idriss N.</b><small>18 ans · Garoua</small></div><em>ATT</em></div><div class="pr-row"><div class="av"></div><div><b>Yannick T.</b><small>20 ans · Bafoussam</small></div><em>ATT</em></div><div class="tabs"><i></i><i class="on"></i><i></i><i></i><i></i></div></div></div></div><div class="f1"><div class="phone xl" aria-hidden="true"><div class="notch"></div><div class="scr vid"><video autoplay muted loop playsinline preload="auto" poster="" src="assets/clip.mp4"></video></div></div></div><div class="f2"><div class="phone " aria-hidden="true"><div class="notch"></div><div class="scr"><div class="sbar"></div><div class="ah"><span>OPPORTUNITÉS</span><i></i></div><div class="opp"><div class="photo"></div><div class="c"><span class="ver">Annonce vérifiée</span><h4>Détection U21 · Douala</h4><div class="kv"><span>Postes</span><b>2 att. · 1 déf. central</b></div><div class="kv"><span>Âge</span><b>18–21 ans</b></div><div class="kv"><span>Lieu</span><b>Douala</b></div><div class="kv"><span>Date</span><b>À confirmer</b></div></div></div><div class="mbtn">Candidater</div><div class="tabs"><i></i><i></i><i></i><i class="on"></i><i></i></div></div></div></div>
+    </div></div>
+  </div></section>
+
+  <section class="sec"><div class="box">
+    <div class="sh rv"><div><small>Déploiement</small><h2>Le Cameroun d'abord, puis toute l'Afrique.</h2><p>À terme, un joueur camerounais pourra être découvert par un agent en Côte d'Ivoire, un recruteur au Sénégal ou un club en Europe.</p></div></div>
+    <div class="wall rv" id="wallx"><span class="cp hot">Cameroun<small>Lancement</small></span><span class="cp">Côte d'Ivoire</span><span class="cp">Sénégal</span><span class="cp">Ghana</span><span class="cp">Nigeria</span><span class="cp">RD Congo</span><span class="cp">Mali</span><span class="cp">Burkina Faso</span><span class="cp">Gabon</span><span class="cp">Maroc</span><span class="cp dim">Et d'autres…</span></div>
+  </div></section>
+
+  <section class="sec"><div class="box">
+    <div class="sh rv"><div><small>Explorer</small><h2>Tout l'écosystème, au même endroit.</h2></div></div>
+    <div class="explore rv">
+      <a href="#joueurs"><b>Joueurs</b><span>Profils et highlights</span></a>
+      <a href="#agents"><b>Agents &amp; clubs</b><span>Recherche de talents</span></a>
+      <a href="#opportunites"><b>Opportunités</b><span>Détections, essais</span></a>
+      <a href="#confiance"><b>Confiance</b><span>Vérification et sécurité</span></a>
+    </div>
+  </div></section>
+
+  <section class="cta"><div class="rg" aria-hidden="true"><i></i><i></i><i></i></div><div class="box in">
+    <div>
+      <h2 class="rv">Prêt à être <em>vu ?</em></h2>
+      <p class="rv" style="--d:.06s">Lancement au Cameroun, puis dans toute l'Afrique.</p>
+      <div class="stores rv" style="--d:.12s">
+        <a class="store" href="#accueil" data-scroll="#contact" aria-label="App Store"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.5 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9s-1.9-.9-3.2-.8c-1.6 0-3.1.9-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3.1 2.5 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.7-1-2.7-4.1zM14 5.4c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z"/></svg><div><small>Télécharger sur</small><span>App Store</span></div></a>
+        <a class="store" href="#accueil" data-scroll="#contact" aria-label="Google Play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 2.7v18.6c0 .5.6.8 1 .5l15.2-9.3c.4-.2.4-.8 0-1L5 2.2c-.4-.3-1 0-1 .5z"/></svg><div><small>Disponible sur</small><span>Google Play</span></div></a>
+      </div>
+    </div>
+    <div class="tile" style="--icon:url(/assets/icon-512.png)" role="img" aria-label="Icône de l'application Spora"></div>
+  </div></section>
+</div>
+
+<!-- ================= JOUEURS ================= -->
+<div class="page" data-page="joueurs" hidden>
+  <section class="ph"><div class="box in">
+    <span class="badge hin"><i></i>Explorer les talents</span>
+    <h1 class="hin" style="--d:.08s">Trouvez votre <span class="grad">prochain talent.</span></h1>
+    <p class="desc hin" style="--d:.16s">Explorez des profils, découvrez leurs infos sportives et trouvez les talents qui correspondent à vos besoins : par poste, âge, pays ou niveau.</p>
+  </div></section>
+  <div class="box">
+    <div class="search" id="pSearch">
+      <input type="search" id="pq" placeholder="Rechercher un joueur, une ville, un club…" aria-label="Rechercher un joueur">
+      <select id="pPos" aria-label="Poste"><option value="">Tous les postes</option><option>Attaquant</option><option>Milieu</option><option>Défenseur</option><option>Gardien</option></select>
+      <select id="pAge" aria-label="Âge"><option value="">Tous les âges</option><option value="16-18">16 - 18 ans</option><option value="19-21">19 - 21 ans</option><option value="22-25">22 - 25 ans</option></select>
+      <select id="pPays" aria-label="Pays"><option value="">Tous les pays</option><option>Cameroun</option><option>Côte d'Ivoire</option><option>Sénégal</option><option>Ghana</option><option>Nigeria</option></select>
+      <select id="pLvl" aria-label="Niveau"><option value="">Tous les niveaux</option><option>Professionnel</option><option>Semi-professionnel</option><option>Amateur</option><option>Académie</option></select>
+    </div>
+    <p class="count" id="pCount"></p>
+    <div class="pgrid" id="pGrid"></div>
+    <div class="empty" id="pEmpty">Aucun joueur ne correspond à cette recherche.</div>
+    <p class="note">Profils fictifs, à titre d'illustration de l'application. Au lancement, les joueurs seront ceux qui s'inscrivent sur Spora.</p>
+  </div>
+  <section class="sec"><div class="box">
+    <div class="sh rv"><div><small>Ton profil</small><h2>Tout ce qu'un recruteur veut savoir, au même endroit.</h2><p>Photo, âge, nationalité, ville, postes, pied dominant, taille et poids, club ou académie, parcours, niveau, statistiques et objectifs sportifs.</p></div></div>
+    <div class="feat3">
+      <div class="f3 rv" data-tilt><small>Étape 1</small><h3>Crée ton profil</h3><p>Télécharge l'app, crée ton compte, complète tes infos sportives.</p></div>
+      <div class="f3 rv" data-tilt style="--d:.08s"><small>Étape 2</small><h3>Ajoute tes vidéos</h3><p>Tes meilleures actions, classées par poste. Spora privilégie les vidéos authentiques et récentes.</p></div>
+      <div class="f3 rv" data-tilt style="--d:.16s"><small>Étape 3</small><h3>Sois découvert</h3><p>Agents et clubs te trouvent, te contactent, tu réponds depuis la messagerie.</p></div>
+    </div>
+    <p class="note rv">Spora ne promet pas de carrière professionnelle. C'est un espace de plus pour te présenter, être découvert et entrer en relation avec les acteurs du football.</p>
+  </div></section>
+</div>
+
+<!-- ================= AGENTS ================= -->
+<div class="page" data-page="agents" hidden>
+  <section class="ph"><div class="box in">
+    <span class="badge hin"><i></i>Agents</span>
+    <h1 class="hin" style="--d:.08s">Trouver le bon joueur, <span class="grad">enfin simple.</span></h1>
+    <p class="desc hin" style="--d:.16s">Au lieu de dépendre des recommandations personnelles ou de vidéos éparpillées sur les réseaux, les agents disposent d'un environnement organisé pour découvrir des profils fiables et bien présentés.</p>
+  </div></section>
+  <div class="box">
+    <div class="search s3">
+      <input type="search" id="aq" placeholder="Rechercher un agent, une spécialité…" aria-label="Rechercher un agent">
+      <select id="aPays" aria-label="Pays d'activité"><option value="">Tous les pays</option><option>Cameroun</option><option>Côte d'Ivoire</option><option>Sénégal</option><option>Ghana</option><option>Nigeria</option></select>
+      <select id="aSp" aria-label="Spécialité"><option value="">Toutes les spécialités</option><option>Jeunes talents</option><option>Attaquants</option><option>Défenseurs</option><option>Gardiens</option></select>
+    </div>
+    <p class="count" id="aCount"></p>
+    <div class="ogrid" id="aGrid"></div>
+    <div class="empty" id="aEmpty">Aucun agent ne correspond à cette recherche.</div>
+    <p class="note">Profils fictifs, à titre d'illustration. Les agents réels auront un statut vérifié après contrôle de leurs informations et licences.</p>
+  </div>
+  <section class="sec"><div class="box">
+    <div class="sh rv"><div><small>Recherche</small><h2>Cherche comme tu penses.</h2><p>Filtre par poste, âge, nationalité, pied, expérience, niveau ou championnat. Par exemple : un attaquant de 18 à 22 ans, un milieu défensif au Cameroun, un défenseur central gaucher, un gardien en académie.</p></div></div>
+    <div class="callout rv"><h2>Tu représentes des joueurs ?</h2><p>Crée ton profil professionnel et rejoins le réseau dès le lancement.</p><div class="row" style="margin-top:24px"><a class="btn y" href="#inscription">Créer un compte</a><a class="btn w" href="#confiance">Comment on vérifie</a></div></div>
+  </div></section>
+</div>
+
+<!-- ================= CLUBS ================= -->
+<div class="page" data-page="clubs" hidden>
+  <section class="ph"><div class="box in">
+    <span class="badge hin"><i></i>Clubs &amp; académies</span>
+    <h1 class="hin" style="--d:.08s">Recrutez par poste, <span class="grad">sans perdre de temps.</span></h1>
+    <p class="desc hin" style="--d:.16s">Les clubs et académies présentent leur structure, consultent des profils, ciblent un poste précis, regardent les vidéos et publient leurs détections.</p>
+  </div></section>
+  <div class="box">
+    <div class="search s2">
+      <input type="search" id="cq" placeholder="Rechercher un club ou une académie…" aria-label="Rechercher un club">
+      <select id="cType" aria-label="Type"><option value="">Clubs et académies</option><option>Club</option><option>Académie</option></select>
+    </div>
+    <p class="count" id="cCount"></p>
+    <div class="ogrid" id="cGrid"></div>
+    <div class="empty" id="cEmpty">Aucun résultat pour cette recherche.</div>
+    <p class="note">Exemples fictifs, à titre d'illustration de l'application.</p>
+  </div>
+  <section class="sec"><div class="box"><div class="info3">
+    <div class="f3 rv" data-tilt><small>Clubs</small><h3>Une vitrine pour le club</h3><p>Identité, ville, championnat, activités. Consulter les profils, cibler un poste précis, regarder les vidéos.</p></div>
+    <div class="f3 rv" data-tilt style="--d:.08s"><small>Académies</small><h3>Valoriser la formation</h3><p>Présenter ses équipes, son environnement et les joueurs accompagnés, et développer son réseau.</p></div>
+    <div class="f3 rv" data-tilt style="--d:.16s"><small>Annonces</small><h3>Publier une détection</h3><p>Postes, âge souhaité, lieu, conditions et date, visibles de tous les joueurs concernés.</p></div>
+  </div></div></section>
+</div>
+
+<!-- ================= HIGHLIGHTS ================= -->
+<div class="page" data-page="highlights" hidden>
+  <section class="ph"><div class="box in">
+    <span class="badge hin"><i></i>Spora Highlights</span>
+    <h1 class="hin" style="--d:.08s">Le talent se voit <span class="grad">en action.</span></h1>
+    <p class="desc hin" style="--d:.16s">Les buts, les skills, les passes, les arrêts et les meilleures performances des talents présents sur Spora.</p>
+    <div class="row hin" style="--d:.24s;margin-top:26px"><button class="btn" data-scroll="#contact" type="button">Publier mon highlight →</button></div>
+  </div></section>
+  <div class="box">
+    <div class="search s2"><input type="search" id="hq" placeholder="Rechercher un joueur ou une vidéo…" aria-label="Rechercher une vidéo"><select id="hCat" aria-label="Catégorie"><option value="">Toutes les catégories</option><option>Buts</option><option>Skills</option><option>Passes</option><option>Défense</option><option>Arrêts</option></select></div>
+    <div class="chipsbar" id="hChips"></div>
+    <p class="count" id="hCount"></p>
+    <div class="vgrid" id="hGrid"></div>
+    <div class="empty" id="hEmpty">Aucune vidéo ne correspond à cette recherche.</div>
+    <p class="note">Aperçus fictifs. Spora privilégie les vidéos authentiques, récentes et représentatives du niveau du joueur.</p>
+  </div>
+  <section class="sec"><div class="box"><div class="callout rv"><h2>Montre ce que tu sais faire.</h2><p>Publie tes meilleures actions et donne aux clubs et aux agents une première impression de ton niveau.</p><div class="row" style="margin-top:24px"><a class="btn y" href="#inscription">Créer mon profil</a></div></div></div></section>
+</div>
+
+<!-- ================= OPPORTUNITÉS ================= -->
+<div class="page" data-page="opportunites" hidden>
+  <section class="ph"><div class="box in">
+    <span class="badge hin"><i></i>Opportunités</span>
+    <h1 class="hin" style="--d:.08s">Les chances du football, <span class="grad">au même endroit.</span></h1>
+    <p class="desc hin" style="--d:.16s">Détections, journées de recrutement, essais, tournois, programmes de formation : les opportunités authentiques, accessibles même sans gros réseau.</p>
+  </div></section>
+  <div class="box">
+    <div class="chipsbar" id="oChips" style="padding-top:34px"></div>
+    <p class="count" id="oCount"></p>
+    <div class="ogrid" id="oGrid"></div>
+    <p class="note">Exemples fictifs. Les annonces réelles seront contrôlées pour limiter les fausses détections, les arnaques et les propositions trompeuses.</p>
+  </div>
+  <section class="sec"><div class="box">
+    <div class="sh rv"><div><small>Où ça commence</small><h2>Le Cameroun d'abord, puis toute l'Afrique.</h2><p>Un joueur d'un pays pourra découvrir des clubs, des agents et des opportunités dans d'autres pays, et à terme en Europe.</p></div></div>
+    <div class="wall rv"><span class="cp hot">Cameroun<small>Lancement</small></span><span class="cp">Côte d'Ivoire</span><span class="cp">Sénégal</span><span class="cp">Ghana</span><span class="cp">Nigeria</span><span class="cp">RD Congo</span><span class="cp">Mali</span><span class="cp">Burkina Faso</span><span class="cp">Gabon</span><span class="cp">Maroc</span><span class="cp dim">Et d'autres…</span></div>
+  </div></section>
+</div>
+
+<!-- ================= CONFIANCE ================= -->
+<div class="page" data-page="confiance" hidden>
+  <section class="ph"><div class="box in">
+    <span class="badge hin"><i></i>Confiance &amp; sécurité</span>
+    <h1 class="hin" style="--d:.08s">Un réseau où l'on peut <span class="grad">avoir confiance.</span></h1>
+    <p class="desc hin" style="--d:.16s">Dans le football, les fausses promesses font des dégâts. Spora met la vérification, le contrôle des annonces et la protection des jeunes joueurs au cœur du produit.</p>
+  </div></section>
+  <section class="sec"><div class="box">
+    <div class="feat3">
+      <div class="f3 rv" data-tilt><small>01 · Agents</small><h3>Statut vérifié</h3><p>Informations professionnelles et licences contrôlées avant d'attribuer un statut de vérification.</p></div>
+      <div class="f3 rv" data-tilt style="--d:.06s"><small>02 · Annonces</small><h3>Opportunités contrôlées</h3><p>Pour limiter les fausses détections, les arnaques et les propositions trompeuses.</p></div>
+      <div class="f3 rv" data-tilt style="--d:.12s"><small>03 · Identité</small><h3>Comptes vérifiés</h3><p>Étapes de vérification d'identité pour des profils fiables.</p></div>
+      <div class="f3 rv" data-tilt><small>04 · Signalement</small><h3>Signaler, bloquer</h3><p>Un profil, un message ou une annonce douteux ? Tu peux le signaler en quelques gestes.</p></div>
+      <div class="f3 rv" data-tilt style="--d:.06s"><small>05 · Jeunes joueurs</small><h3>L'accord du tuteur</h3><p>Pour les mineurs, un accompagnement avec l'accord d'un tuteur.</p></div>
+      <div class="f3 rv" data-tilt style="--d:.12s"><small>06 · Vie privée</small><h3>Tu gardes la main</h3><p>Des paramètres de confidentialité pour choisir ce qui est visible, dont tes coordonnées.</p></div>
+    </div>
+    <p class="note rv">Spora ne remplace ni les agents, ni les clubs, ni les académies. L'outil facilite les connexions et la circulation de l'information, sans promettre de carrière.</p>
+  </div></section>
+</div>
+
+<!-- ================= OFFRES ================= -->
+<div class="page" data-page="premium" hidden>
+  <section class="ph"><div class="box in">
+    <span class="badge hin"><i></i>Offres</span>
+    <h1 class="hin" style="--d:.08s">Gratuit pour commencer. <span class="grad">Accessible ensuite.</span></h1>
+    <p class="desc hin" style="--d:.16s">L'application se télécharge gratuitement. Des fonctionnalités complémentaires sont proposées sans fermer la porte aux jeunes joueurs qui ont peu de moyens.</p>
+  </div></section>
+  <section class="sec"><div class="box">
+    <div class="plans p4">
+      <div class="plan rv" data-tilt><span class="nm">GRATUIT</span><div class="pr">0<small>FCFA</small></div><p>Pour te présenter et être trouvé.</p><ul><li>Profil vérifié</li><li>2 vidéos</li><li>Visible dans la recherche</li></ul><a class="btn" href="#inscription">Commencer</a></div>
+      <div class="plan rv" data-tilt style="--d:.06s"><span class="nm">STANDARD</span><div class="pr">10 000<small>FCFA / an</small></div><p>Un profil complet pour convaincre.</p><ul><li>Jusqu'à 10 vidéos</li><li>Statistiques et parcours</li><li>Alerte quand un recruteur consulte ton profil</li></ul><a class="btn" href="#inscription">Choisir Standard</a></div>
+      <div class="plan pro rv" data-tilt style="--d:.12s"><span class="tg">Mis en avant</span><span class="nm">PREMIUM</span><div class="pr">50 000<small>FCFA / an</small></div><p>Plus de visibilité auprès des recruteurs.</p><ul><li>Tout Standard</li><li>Profil mis en avant dans les résultats</li><li>Rapport de performance</li><li>Candidature prioritaire aux détections</li></ul><a class="btn y" href="#inscription">Choisir Premium</a></div>
+      <div class="plan rv" data-tilt style="--d:.18s"><span class="nm">ÉLITE</span><div class="pr">100 000<small>FCFA / an</small></div><p>Un accès direct aux professionnels.</p><ul><li>Tout Premium</li><li>Mise en relation avec des agents partenaires</li><li>Candidature aux essais organisés avec des clubs</li></ul><a class="btn" href="#inscription">Choisir Élite</a></div>
+    </div>
+    <p class="note rv">Agents, clubs et académies utilisent Spora gratuitement. L'offre Élite donne un accès (mise en relation, candidature), jamais une promesse d'essai ou de contrat. Les prix sont indicatifs et peuvent évoluer avant l'ouverture. Paiement annuel par mobile money, possible en plusieurs fois. Tarif réduit ou gratuit pour les joueurs des académies partenaires. Pour les mineurs, la famille paie et donne son accord.</p>
+  </div></section>
+</div>
+
+<div class="page" data-page="inscription" hidden>
+  <section class="ph"><div class="box in">
+    <span class="badge hin"><i></i>Rejoindre Spora</span>
+    <h1 class="hin" style="--d:.08s">Crée ton profil. <span class="grad">Sois repéré.</span></h1>
+    <p class="desc hin" style="--d:.16s">Choisis qui tu es : joueur, agent, club ou simple invité. Chaque profil a son propre parcours d'inscription.</p>
+  </div></section>
+  <section class="sec"><div class="box">
+    <div class="jn">
+      <div class="jn-card">
+        <div class="jn-tabs" role="tablist"><button type="button" id="tabSign" role="tab">Créer un compte</button><button type="button" id="tabLog" role="tab">Connexion</button></div>
+        <div id="jnSign"><ol class="jn-steps" id="jnSteps"></ol><form id="jnForm" novalidate></form></div>
+        <div id="jnLogin" hidden></div>
+      </div>
+      <aside class="jn-side"><div id="jnPv" class="jn-pv"></div><p class="note" style="margin-top:14px">Aperçu en direct de ta carte. Tes informations sont enregistrées à la fin de l'inscription ; ton profil devient visible après vérification par l'équipe Spora.</p></aside>
+    </div>
+  </div></section>
+</div>
+<!-- ================= MON ESPACE ================= -->
+<div class="page" data-page="espace" hidden>
+  <section class="ph"><div class="box in">
+    <span class="badge hin"><i></i>Mon espace</span>
+    <h1 class="hin" style="--d:.08s">Ton compte <span class="grad">Spora.</span></h1>
+    <p class="desc hin" style="--d:.16s">Gère ton profil, tes mises en relation, ton offre et tes données.</p>
+  </div></section>
+  <section class="sec"><div class="box"><div class="jn" id="esp" aria-live="polite"></div></div></section>
+</div>
+
+<!-- ================= NOUVEAU MOT DE PASSE ================= -->
+<div class="page" data-page="reinitialiser" hidden>
+  <section class="ph"><div class="box in">
+    <span class="badge hin"><i></i>Sécurité</span>
+    <h1 class="hin" style="--d:.08s">Nouveau <span class="grad">mot de passe.</span></h1>
+  </div></section>
+  <section class="sec"><div class="box"><div class="jn"><div class="jn-card" id="rst"></div></div></div></section>
+</div>
+</main>
+
+<footer id="contact"><div class="box">
+  <div class="fm">
+    <div><a class="brand" href="#accueil"><img class="mk" src="assets/logo-icon.svg" alt="" width="40" height="40"><span class="wm" role="img" aria-label="Spora"></span></a><p>La plateforme qui connecte les talents, les agents et les clubs.</p></div>
+    <div><h4>Plateforme</h4><a href="#joueurs">Joueurs</a><a href="#agents">Agents</a><a href="#clubs">Clubs</a><a href="#highlights">Highlights</a><a href="#opportunites">Opportunités</a></div>
+    <div><h4>SPORA</h4><a href="#confiance">Confiance &amp; sécurité</a><a href="#premium">Offres</a><a href="#accueil">Contact</a><a href="#accueil">TikTok · Instagram · Facebook</a></div>
+  </div>
+  <div class="copy"><span>© 2026 SPORA — Tous droits réservés.</span><span>Spora ne promet pas de carrière professionnelle. Lancement au Cameroun, puis dans toute l'Afrique.</span></div>
+</div></footer>
+<script src="js/api.js" defer></script>
+<script src="js/app.js" defer></script>
+<script src="js/espace.js" defer></script>
+</body>
+</html>
