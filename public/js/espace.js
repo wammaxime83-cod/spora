@@ -119,6 +119,23 @@ $('#ctX').addEventListener('click',function(){dlg.close()});
 $('#ctF').addEventListener('submit',function(e){e.preventDefault();var m=$('#ctM').value.trim(),er=$('#ctE');
  Spora.api('POST','/contacts',{to:to,message:m}).then(function(){dlg.close();location.hash='#espace'},function(x){er.textContent=x.message;er.hidden=false})});
 
+/* ---- fiche joueur (infos publiques minimales) ---- */
+var pdlg=document.createElement('dialog');pdlg.style.cssText='border:1px solid var(--border);border-radius:22px;padding:22px;max-width:440px;width:calc(100% - 32px);background:var(--surface);color:var(--text)';
+document.body.appendChild(pdlg);
+pdlg.addEventListener('click',function(e){if(e.target===pdlg||e.target.closest('[data-pclose]'))pdlg.close()});
+function openProfile(id){pdlg.innerHTML='<p style="margin:0">Chargement…</p>';if(pdlg.showModal)pdlg.showModal();else pdlg.setAttribute('open','');
+ Spora.api('GET','/players/'+id).then(function(j){var p=j.player,u=Spora.user,ini=(p.name||'?').charAt(0).toUpperCase();
+  var rows=[['Poste',p.pos],['Pays',p.nat],['Âge',p.age!=null?p.age+' ans':null],['Ville',p.city],['Niveau',p.lvl],['Pied',p.foot],['Taille',p.h?p.h+' cm':null],['Club',p.club]].filter(function(r){return r[1]});
+  var act='';
+  if(p.videos)act+='<button type="button" data-pclose data-pvid="'+p.id+'" data-nm="'+esc(p.name)+'" class="btn" style="border:0;cursor:pointer;width:100%">▶ Voir ses vidéos ('+p.videos+')</button>';
+  if(!u)act+='<a class="btn ghost" href="#connexion" data-pclose style="width:100%;text-align:center">Se connecter pour contacter →</a>';
+  else if(u.id===p.id)act+='<a class="btn ghost" href="#espace" data-pclose style="width:100%;text-align:center">C’est ton profil · gérer →</a>';
+  else if(u.role!=='joueur'&&u.status==='verifie')act+='<button type="button" data-pclose data-contact="'+p.id+'" data-nm="'+esc(p.name)+'" class="btn ghost" style="cursor:pointer;width:100%">Contacter →</button>';
+  else act+='<p style="margin:0;color:var(--text2);font-size:.9rem;text-align:center">'+(u.role==='joueur'?'Contact réservé aux agents et aux clubs vérifiés.':'Contact disponible après vérification de ton profil.')+'</p>';
+  pdlg.innerHTML='<div style="display:flex;gap:14px;align-items:center;margin-bottom:14px">'+(p.photo?'<img alt="" src="'+esc(p.photo)+'" style="width:76px;height:76px;border-radius:50%;object-fit:cover">':'<span style="width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:var(--primary);color:#fff;font-size:1.8rem;font-weight:800">'+esc(ini)+'</span>')+'<div style="flex:1;min-width:0"><h2 style="margin:0;font-size:1.35rem">'+esc(p.name)+' <span title="Profil vérifié" style="color:var(--primary)">✓</span></h2><small style="color:var(--text2);font-weight:600">Joueur vérifié Spora'+(p.featured?' · ★ Mis en avant':'')+'</small></div><button type="button" data-pclose aria-label="Fermer" style="background:none;border:0;color:var(--text2);font:inherit;font-weight:800;cursor:pointer;align-self:flex-start">✕</button></div>'
+   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">'+rows.map(function(r){return '<div style="background:var(--surface2);border-radius:12px;padding:10px 12px"><small style="color:var(--text2);font-weight:700;display:block">'+r[0]+'</small><b>'+esc(r[1])+'</b></div>'}).join('')+'</div>'
+   +(p.bio?'<p style="margin:0 0 14px;overflow-wrap:anywhere">'+esc(p.bio)+'</p>':'')+'<div style="display:flex;flex-direction:column;gap:10px">'+act+'</div>'},function(er){pdlg.innerHTML='<p style="margin:0 0 12px">'+esc(er.message||'Profil introuvable.')+'</p><button type="button" data-pclose class="btn ghost" style="cursor:pointer">Fermer</button>'})}
+
 /* ---- vidéos d'un joueur (depuis l'annuaire) ---- */
 var vdlg=document.createElement('dialog');vdlg.style.cssText='border:1px solid var(--border);border-radius:22px;padding:20px;max-width:520px;width:calc(100% - 32px);background:var(--surface);color:var(--text)';
 vdlg.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h2 id="vdT" style="margin:0;font-size:1.3rem"></h2><button type="button" id="vdX" style="background:none;border:0;color:var(--text2);font:inherit;font-weight:800;cursor:pointer">Fermer</button></div><div id="vdB"></div>';
@@ -147,7 +164,7 @@ function loadFeed(){Spora.api('GET','/videos').then(function(j){
 
  g.className='hvl';
  function card(v){var p=v.player||{};var ini=(p.name||'?').charAt(0).toUpperCase();
-  return '<article class="hv" data-id="'+v.id+'"><div class="who"><span class="av">'+esc(ini)+'</span><div><b>'+esc(p.name||'')+'</b><small>'+esc([RL[p.role],p.pos,p.nat].filter(Boolean).join(' · '))+'</small>'+(v.title?'<p>'+esc(v.title)+'</p>':'')+'</div></div>'
+  return '<article class="hv" data-id="'+v.id+'" data-pid="'+(p.id||'')+'"><div class="who"><span class="av pp" role="button" tabindex="0" aria-label="Voir le profil">'+esc(ini)+'</span><div><b class="pp" role="button" tabindex="0">'+esc(p.name||'')+'</b><small>'+esc([RL[p.role],p.pos,p.nat].filter(Boolean).join(' · '))+'</small>'+(v.title?'<p>'+esc(v.title)+'</p>':'')+'</div></div>'
   +'<div class="vw"><video playsinline loop muted preload="metadata" '+(v.poster?'poster="'+esc(v.poster)+'" ':'')+'src="'+esc(v.src)+'"></video><button type="button" class="snd" aria-label="Activer le son">🔇</button></div>'
   +'<div class="act"><button type="button" data-a="like" class="'+(v.liked?'on':'')+'" aria-pressed="'+(v.liked?'true':'false')+'"><i>'+(v.liked?'♥':'♡')+'</i><span>'+(v.likes||0)+'</span></button>'
   +'<button type="button" data-a="cm"><i>💬</i><span>'+(v.comments||0)+'</span></button>'
@@ -161,6 +178,7 @@ function loadFeed(){Spora.api('GET','/videos').then(function(j){
  function loadCm(card){return Spora.api('GET','/videos/'+card.dataset.id+'/comments').then(function(j){drawCm(card,j.comments||[])},function(){})}
  function onClick(e){var card=e.target.closest('article.hv');if(!card)return;var vd=card.querySelector('video'),inZap=!!card.closest('.zap');
   if(e.target.closest('.snd')){vd.muted=!vd.muted;e.target.closest('.snd').textContent=vd.muted?'🔇':'🔊';return}
+  var pp=e.target.closest('.pp');if(pp&&card.dataset.pid){openProfile(card.dataset.pid);return}
   var cx=e.target.closest('.cx');if(cx){Spora.api('DELETE','/videos/comments/'+cx.dataset.cid).then(function(){loadCm(card)},function(){});return}
   var bt=e.target.closest('[data-a]');
   if(bt){var a=bt.dataset.a;
