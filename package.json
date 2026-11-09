@@ -1,0 +1,27 @@
+{
+  "name": "spora-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Serveur Spora : site statique + API (comptes, profils, contacts)",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20.12"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^13.0.3",
+    "compression": "^1.8.2",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.22.3",
+    "express-rate-limit": "^8.7.3",
+    "helmet": "^8.3.0",
+    "nodemailer": "^10.4.0",
+    "zod": "^4.6.7"
+  }
+}
