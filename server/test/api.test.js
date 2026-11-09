@@ -175,7 +175,12 @@ test('vidéos : envoi signé, vérification, limite, fil public, suppression', a
     assert.equal((await other.req('POST', `/api/videos/${vid}/comments`, { body: 'Magnifique action !' })).status, 201);
     const cms = await new Client().req('GET', `/api/videos/${vid}/comments`);
     assert.equal(cms.body.comments.length, 1); assert.equal(cms.body.comments[0].name, 'Autre J.'); assert.equal(cms.body.comments[0].mine, false);
-    assert.equal((await pl.req('GET', '/api/videos')).body.videos[0].comments, 1);
+    const gst = new Client();
+    assert.equal((await gst.req('POST', '/api/auth/register', { role: 'invite', name: 'Visiteur Un', email: 'inv@test.cm', password: 'Motdepasse!2026x', accept_terms: true, profile: { ctry: 'Cameroun' } })).status, 201);
+    assert.equal((await gst.req('POST', `/api/videos/${vid}/comments`, { body: 'Beau geste !' })).status, 201);
+    assert.equal((await gst.req('POST', `/api/videos/${vid}/like`)).status, 200);
+    assert.equal((await gst.req('GET', `/api/videos/${vid}/comments`)).body.comments.length, 2);
+    assert.equal((await pl.req('GET', '/api/videos')).body.videos[0].comments, 2);
     assert.equal((await new Client().req('DELETE', `/api/videos/comments/${cms.body.comments[0].id}`)).status, 401);
     assert.equal((await pl.req('DELETE', `/api/videos/comments/${cms.body.comments[0].id}`)).status, 403);
     assert.equal((await other.req('DELETE', `/api/videos/comments/${cms.body.comments[0].id}`)).status, 200);
