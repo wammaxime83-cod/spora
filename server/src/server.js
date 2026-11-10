@@ -1,6 +1,4 @@
 'use strict';
-const path = require('path');
-const fs = require('fs');
 const express = require('express');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -64,19 +62,8 @@ function createApp() {
   app.use('/api', api);
   app.use('/uploads', players.uploads);
 
-  // Fichiers statiques. index.html, robots.txt : {{SITE_URL}} est remplacé par l'adresse réelle.
-  const tpl = {};
-  const render = name => {
-    if (!tpl[name]) tpl[name] = fs.readFileSync(path.join(config.publicDir, name), 'utf8').replaceAll('{{SITE_URL}}', config.siteUrl);
-    return tpl[name];
-  };
-  app.get(['/', '/index.html'], (req, res) => res.type('html').set('Cache-Control', 'no-cache').send(render('index.html')));
-  app.get('/robots.txt', (req, res) => res.type('text/plain').send(render('robots.txt')));
-  app.get('/sitemap.xml', (req, res) => res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${config.siteUrl}/</loc></url></urlset>`));
-  if (fs.existsSync(path.join(config.publicDir, 'admin.html'))) {
-    app.get('/admin', (req, res) => res.sendFile(path.join(config.publicDir, 'admin.html'), { headers: { 'X-Robots-Tag': 'noindex' } }));
-  }
-  app.use(express.static(config.publicDir, { index: false, maxAge: config.isProd ? '1d' : 0, setHeaders: (res, p) => { if (/\.(html|webmanifest|css|js)$/.test(p)) res.set('Cache-Control', 'no-cache'); } }));
+  // Site Next.js exporté (pages, ressources, robots.txt, sitemap.xml) : voir site.js.
+  app.use(require('./site').siteRouter());
 
   app.use((req, res) => res.status(404).type('text').send('Page introuvable.'));
   // eslint-disable-next-line no-unused-vars

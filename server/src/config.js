@@ -17,7 +17,8 @@ const config = {
   port: num(env.PORT, 3000),
   siteUrl: (env.SITE_URL || 'http://localhost:' + num(env.PORT, 3000)).replace(/\/+$/, ''),
   dataDir: path.resolve(env.DATA_DIR || path.join(__dirname, '..', 'data')),
-  publicDir: path.resolve(env.PUBLIC_DIR || path.join(__dirname, '..', '..', 'public')),
+  // Site Next.js exporté (web/out). Construit par `npm run build` dans web/ (fait automatiquement par le Dockerfile).
+  publicDir: path.resolve(env.PUBLIC_DIR || path.join(__dirname, '..', '..', 'web', 'out')),
   sessionDays: num(env.SESSION_DAYS, 30),
   // Derrière un proxy (Render, Railway, Nginx...), mettre TRUST_PROXY=1
   trustProxy: env.TRUST_PROXY || (isProd ? '1' : ''),

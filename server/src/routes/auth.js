@@ -110,7 +110,7 @@ router.get('/verify', async (req, res) => {
     await db.prepare('UPDATE users SET email_verified = 1 WHERE id = ?').run(row.user_id);
     await db.prepare('DELETE FROM email_tokens WHERE id = ?').run(row.id);
   }
-  res.redirect('/#connexion' + (row ? '' : ''));
+  res.redirect('/connexion/');
 });
 
 router.post('/resend-verification', authLimiter, requireAuth, async (req, res) => {
@@ -128,7 +128,7 @@ router.post('/forgot', authLimiter, async (req, res, next) => {
         await db.prepare("DELETE FROM email_tokens WHERE user_id = ? AND kind = 'reset'").run(u.id);
         await db.prepare('INSERT INTO email_tokens (user_id, kind, token_hash, expires_at) VALUES (?,?,?,?)').run(u.id, 'reset', sha256(token), inMinutes(60));
         sendMail(u.email, 'Réinitialise ton mot de passe Spora',
-          `Bonjour ${u.name},\n\nPour choisir un nouveau mot de passe (lien valable 1 heure) :\n${config.siteUrl}/#reinitialiser?token=${token}\n\nSi tu n'as rien demandé, ignore ce message.`).catch(() => {});
+          `Bonjour ${u.name},\n\nPour choisir un nouveau mot de passe (lien valable 1 heure) :\n${config.siteUrl}/reinitialiser/?token=${token}\n\nSi tu n'as rien demandé, ignore ce message.`).catch(() => {});
       }
     }
     res.json({ ok: true }); // même réponse que l'adresse existe ou non

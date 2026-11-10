@@ -544,13 +544,13 @@ background:
 .jn-pv .fk{margin-top:12px;font-size:11.5px;color:var(--text2);font-weight:700;letter-spacing:.04em}
 /* décor orbite */
 .d-join .ob{right:9%;top:50%;width:min(300px,34vw);aspect-ratio:1;translate:0 -50%;border-radius:50%;border:1.5px dashed rgba(var(--pa),.5);animation:spin 30s linear infinite}
-.d-join .ob::after{content:"";position:absolute;inset:30%;border-radius:26%;background:url(../assets/logo-icon.svg) center/contain no-repeat;box-shadow:0 14px 34px rgba(var(--pa),.35);animation:spin 30s linear infinite reverse}
+.d-join .ob::after{content:"";position:absolute;inset:30%;border-radius:26%;background:url(/assets/logo-icon.svg) center/contain no-repeat;box-shadow:0 14px 34px rgba(var(--pa),.35);animation:spin 30s linear infinite reverse}
 .d-join .ob b{position:absolute;width:46px;height:46px;margin:-23px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:1.5px solid rgba(var(--pa),.55);font-weight:800;color:rgb(var(--pa));box-shadow:0 10px 24px rgba(var(--pa),.2);animation:spin 30s linear infinite reverse}
 .d-join .o1{top:0;left:50%}.d-join .o2{top:50%;left:100%}.d-join .o3{top:100%;left:50%}.d-join .o4{top:50%;left:0}
 
 /* ===== Marque : logo vectoriel ===== */
 .brand .mk{width:40px;height:40px;border-radius:0;box-shadow:none;filter:drop-shadow(0 4px 10px rgba(232,134,42,.35))}
-.wm{display:block;height:19px;aspect-ratio:1225/198;background:currentColor;-webkit-mask:url(../assets/wordmark-navy.svg) center/contain no-repeat;mask:url(../assets/wordmark-navy.svg) center/contain no-repeat}
+.wm{display:block;height:19px;aspect-ratio:1225/198;background:currentColor;-webkit-mask:url(/assets/wordmark-navy.svg) center/contain no-repeat;mask:url(/assets/wordmark-navy.svg) center/contain no-repeat}
 .ball{mix-blend-mode:normal;-webkit-mask-image:none;mask-image:none;filter:drop-shadow(0 30px 60px rgba(232,134,42,.35)) var(--h-ball-f)}
 
 .plans.p4{grid-template-columns:minmax(0,1fr)}

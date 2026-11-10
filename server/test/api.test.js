@@ -34,6 +34,18 @@ test('santé + page d\'accueil + en-têtes de sécurité', async () => {
   assert.match(r.headers.get('content-security-policy'), /script-src 'self'/);
 });
 
+test('site Next.js : pages, redirection /page -> /page/, CSP par empreintes, noindex', { skip: !require('fs').existsSync(require('../src/config').publicDir + '/index.html') && 'web/out absent (lance « npm run build » dans web/)' }, async () => {
+  let r = await fetch(base + '/joueurs', { redirect: 'manual' }); assert.equal(r.status, 301); assert.equal(r.headers.get('location'), '/joueurs/');
+  r = await fetch(base + '/joueurs/'); assert.equal(r.status, 200);
+  const csp = r.headers.get('content-security-policy'); assert.match(csp, /script-src 'self' 'sha256-/); assert.ok(!csp.split(';').find(x => x.includes('script-src')).includes('unsafe-inline'));
+  assert.ok(!(await r.text()).includes('{{SITE_URL}}'));
+  r = await fetch(base + '/admin/'); assert.equal(r.status, 200); assert.equal(r.headers.get('x-robots-tag'), 'noindex');
+  r = await fetch(base + '/reinitialiser/?token=abc'); assert.equal(r.status, 200);
+  r = await fetch(base + '/nexiste-pas/'); assert.equal(r.status, 404);
+  r = await fetch(base + '/assets/logo-icon.svg'); assert.equal(r.status, 200);
+  r = await fetch(base + '/sitemap.xml'); assert.match(await r.text(), /\/offres\//);
+});
+
 test('inscription, session, déconnexion, connexion', async () => {
   const c = new Client();
   let r = await c.req('POST', '/api/auth/register', player());

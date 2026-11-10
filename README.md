@@ -2,7 +2,7 @@
 
 Réseau des talents du football africain. Lancement : Cameroun.
 
-- **Front** : HTML / CSS / JavaScript (`public/`)
+- **Front** : Next.js 15 + React + TypeScript (`web/`), architecture **MVC**, exporté en site statique servi par le serveur Express
 - **Serveur** : Node.js 20.12+ / Express (`server/`)
 - **Base de données** : libSQL / SQLite — un simple fichier en local, **Turso** (gratuit) en production
 - **Fonctions** : comptes (joueur, agent, club), connexion sécurisée, profils + photo, annuaire des joueurs vérifiés, demandes de contact (accord du joueur), mode invité, mot de passe oublié, export/suppression des données, panneau d'administration (`/admin`).
@@ -10,12 +10,14 @@ Réseau des talents du football africain. Lancement : Cameroun.
 ## Lancer en local
 
 ```bash
-cd server
+cd web && npm install && npm run build     # construit le site (dossier web/out)
+cd ../server
 npm install
 cp .env.example .env      # puis édite ADMIN_EMAILS (ton e-mail)
 npm start                 # http://localhost:3000
-npm test                  # tests automatiques
+npm test                  # tests automatiques (refaire « npm run build » dans web/ après chaque changement du front)
 ```
+Pendant que tu modifies le front : `cd web && npm run dev` (http://localhost:3001) ; les appels `/api` doivent alors viser le serveur : lance aussi `npm start` et ouvre plutôt http://localhost:3000 après un `npm run build`.
 Crée ton compte sur le site avec l'e-mail mis dans `ADMIN_EMAILS` : il devient administrateur (page `/admin`).
 
 ## Mettre en ligne gratuitement (Render + Turso)
@@ -69,11 +71,18 @@ Turso garde des sauvegardes (voir son tableau de bord). En mode fichier local, s
 - **Paiements** : non intégrés. L'admin active l'offre d'un membre (`/admin`) après réception du règlement (Mobile Money, etc.). Pour automatiser : CinetPay, Flutterwave, etc.
 - **Offre Élite** : donne un *accès* aux professionnels, jamais une promesse de contrat ou d'essai.
 
-## Structure
+## Structure (MVC)
 ```
-public/            site (index.html, admin.html, css/, js/, assets/)
-server/src/        serveur : routes/, db.js, validators.js, middleware.js…
-server/test/       tests automatiques
-Dockerfile         image prête pour l'hébergement
+web/src/models/        MODEL : données et accès au serveur (api.ts, services.ts, types, formulaires, profils d'exemple)
+web/src/controllers/   CONTROLLER : logique et état (connexion, annuaires + filtres, inscription, mon espace, chat, highlights, admin, effets du site)
+web/src/views/         VIEW : affichage seul (layout/, pages/, components/) ; aucune requête réseau
+web/src/app/           routes Next.js (une page = un fichier qui appelle une vue)
+web/src/styles/        feuilles de style (site.css, admin.css)
+web/public/            images, manifest, robots.txt
+server/src/            serveur : routes/, db.js, validators.js, middleware.js, site.js (sert web/out)
+server/test/           tests automatiques
+Dockerfile             construit le site puis l'image du serveur
 ```
+Les anciens liens du type `/#joueurs` sont redirigés vers `/joueurs/`. Le serveur applique une CSP stricte page par page (empreintes sha256 des scripts de Next, pas de `unsafe-inline` pour les scripts).
+
 Sécurité intégrée : mots de passe bcrypt, session par cookie httpOnly, protection CSRF (contrôle de l'origine), CSP stricte, limitation de débit, validation de toutes les entrées, photos contrôlées (type réel et taille).
