@@ -615,5 +615,3 @@ background:
 /* Accueil en fil plein écran (style TikTok) : sous l'en-tête, couvre la page */
 .zap.tk{inset:calc(74px + env(safe-area-inset-top,0px)) 0 0 0;z-index:50}
 .zap.tk .zs{height:calc(100vh - 74px - env(safe-area-inset-top,0px));height:calc(100dvh - 74px - env(safe-area-inset-top,0px))}
-body.feedhome footer{display:none}
-body.feedhome{overflow:hidden}

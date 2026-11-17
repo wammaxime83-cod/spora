@@ -1,6 +1,6 @@
 'use client';
 /* VIEW : accueil = fil de vidéos plein écran (style TikTok). Sans vraie vidéo, on garde la présentation de Spora. */
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAutoplay, useHighlights } from '@/controllers/useHighlights';
 import { FeedCard } from '../components/FeedCard';
@@ -10,8 +10,6 @@ export function FeedHomePage() {
   const h = useHighlights(); const router = useRouter();
   const list = useRef<HTMLDivElement>(null);
   useAutoplay(list, [h.list.length], true);
-  const feed = h.videos === null || h.videos.length > 0;
-  useEffect(() => { document.body.classList.toggle('feedhome', feed); return () => document.body.classList.remove('feedhome'); }, [feed]);
   if (h.videos === null) return <div className="zap tk" aria-busy="true" />;
   if (!h.videos.length) return <HomePage />;
   const go = (d: number) => list.current?.scrollBy({ top: d * (list.current?.clientHeight || 0), behavior: 'smooth' });
