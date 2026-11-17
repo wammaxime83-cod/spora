@@ -45,6 +45,9 @@ export function SiteShell({ children }: { children: ReactNode }) {
       </header>
       <div id="menu" aria-label="Menu">
         {[...NAV.slice(0, 6), ['/confiance/', 'Confiance'] as [string, string], NAV[6]].map(([h, l]) => <Link key={h} href={h} aria-current={cur(h)}>{l}</Link>)}
+        {user
+          ? <Link href="/espace/" aria-current={cur('/espace/')}>Mon espace</Link>
+          : <><Link href="/connexion/" aria-current={cur('/connexion/')}>Connexion</Link><Link href="/inscription/" aria-current={cur('/inscription/')}>Créer un compte</Link></>}
       </div>
       <main>{children}</main>
       <footer id="contact">

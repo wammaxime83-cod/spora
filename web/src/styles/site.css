@@ -57,7 +57,7 @@ nav.main a[aria-current="page"]{color:var(--primary);background:rgba(21,53,122,.
 @media (max-width:1250px){nav.main{gap:2px}nav.main a{padding:9px 10px;font-size:13.5px}}
 .hr{display:flex;align-items:center;gap:10px;margin-left:auto}
 .login{display:none;font-size:14px;font-weight:700;padding:0 8px}
-@media (min-width:1050px){.login{display:block}}
+@media (min-width:560px){.login{display:block}}
 .theme,.burger{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--border);background:var(--surface);transition:transform .25s var(--ease),border-color .2s}
 .theme:hover{transform:rotate(18deg);border-color:var(--primary)}.theme svg{width:19px;height:19px}
 .ic-sun{display:none}
