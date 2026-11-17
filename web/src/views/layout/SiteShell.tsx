@@ -44,7 +44,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <div id="menu" aria-label="Menu">
-        {[...NAV.slice(0, 6), ['/a-propos/', 'À propos'] as [string, string], ['/confiance/', 'Confiance'] as [string, string], NAV[6]].map(([h, l]) => <Link key={h} href={h} aria-current={cur(h)}>{l}</Link>)}
+        {[...NAV.slice(0, 6), ['/confiance/', 'Confiance'] as [string, string], NAV[6]].map(([h, l]) => <Link key={h} href={h} aria-current={cur(h)}>{l}</Link>)}
         {user
           ? <Link href="/espace/" aria-current={cur('/espace/')}>Mon espace</Link>
           : <><Link href="/connexion/" aria-current={cur('/connexion/')}>Connexion</Link><Link href="/inscription/" aria-current={cur('/inscription/')}>Créer un compte</Link></>}
@@ -55,7 +55,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           <div className="fm">
             <div><Brand /><p>La plateforme qui connecte les talents, les agents et les clubs.</p></div>
             <div><h4>Plateforme</h4><Link href="/joueurs/">Joueurs</Link><Link href="/agents/">Agents</Link><Link href="/clubs/">Clubs</Link><Link href="/highlights/">Highlights</Link><Link href="/opportunites/">Opportunités</Link></div>
-            <div><h4>SPORA</h4><Link href="/a-propos/">À propos</Link><Link href="/confiance/">Confiance &amp; sécurité</Link><Link href="/offres/">Offres</Link><Link href="/">Contact</Link><Link href="/">TikTok · Instagram · Facebook</Link></div>
+            <div><h4>SPORA</h4><Link href="/confiance/">Confiance &amp; sécurité</Link><Link href="/offres/">Offres</Link><Link href="/">Contact</Link><Link href="/">TikTok · Instagram · Facebook</Link></div>
           </div>
           <div className="copy"><span>© 2026 SPORA — Tous droits réservés.</span><span>Spora ne promet pas de carrière professionnelle. Lancement au Cameroun, puis dans toute l&apos;Afrique.</span></div>
         </div>
