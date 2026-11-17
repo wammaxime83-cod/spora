@@ -1,2 +1,2 @@
-import { HomePage } from '@/views/pages/HomePage';
-export default function Page() { return <HomePage />; }
+import { FeedHomePage } from '@/views/pages/FeedHomePage';
+export default function Page() { return <FeedHomePage />; }

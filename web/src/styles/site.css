@@ -612,3 +612,6 @@ background:
 .hc.sw>*{animation:hcIn .5s ease both}@keyframes hcIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 .hv .who .pp{pointer-events:auto;cursor:pointer}.hv .who b.pp:hover{text-decoration:underline}
+/* Accueil en fil plein écran (style TikTok) : sous l'en-tête, couvre la page */
+.zap.tk{inset:calc(74px + env(safe-area-inset-top,0px)) 0 0 0;z-index:50}
+.zap.tk .zs{height:calc(100vh - 74px - env(safe-area-inset-top,0px));height:calc(100dvh - 74px - env(safe-area-inset-top,0px))}
